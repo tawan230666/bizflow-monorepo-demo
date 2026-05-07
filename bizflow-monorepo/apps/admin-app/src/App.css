@@ -26,27 +26,81 @@
   -webkit-text-fill-color: transparent;
 }
 
+/* =========================================
+   สไตล์เมนูด้านซ้าย (Sidebar Nav Links)
+   ========================================= */
 .nav-link {
   display: block;
   padding: 14px 18px;
-  margin-bottom: 8px;
-  border-radius: 8px;
+  margin-bottom: 12px;
+  border-radius: 12px;
   color: var(--text-muted);
   text-decoration: none;
   font-weight: 500;
-  transition: all 0.2s ease-in-out;
   border: 1px solid transparent;
+  
+  /* เพิ่มความสมูทเวลาเคลื่อนที่ */
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  position: relative;
+  overflow: hidden;
 }
 
+/* เอฟเฟกต์ตอนเอาเมาส์ชี้ (Hover) - เลื่อนขวาและลอยขึ้น */
 .nav-link:hover {
-  background-color: rgba(255, 255, 255, 0.05);
+  background-color: rgba(255, 255, 255, 0.03);
   color: var(--text-main);
+  transform: translateX(8px) translateY(-2px);
+  box-shadow: 0 6px 12px -2px rgba(0, 0, 0, 0.3);
+  border-color: rgba(255, 255, 255, 0.05);
 }
 
+/* เอฟเฟกต์ตอนกดเลือกหน้า (Active) */
 .nav-link.active {
   background-color: rgba(59, 130, 246, 0.1);
-  color: var(--accent);
+  color: var(--accent); /* สีฟ้า */
   border: 1px solid rgba(59, 130, 246, 0.2);
+  
+  /* ดันไปทางขวาให้ดูมีเลเยอร์ */
+  transform: translateX(12px); 
+  
+  /* สร้างแถบเรืองแสงสีฟ้าด้านซ้าย และเงาเรืองแสง */
+  box-shadow: inset 4px 0px 0px var(--accent), 0 4px 15px rgba(59, 130, 246, 0.15); 
+}
+
+/* ลูกเล่นแสงวิ่งผ่านตอน Active (ให้ดูเหมือนแอปไฮเทค) */
+.nav-link.active::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(to right, transparent, rgba(59, 130, 246, 0.1), transparent);
+  animation: sweep 2.5s infinite linear;
+}
+
+@keyframes sweep {
+  0% { left: -100%; }
+  100% { left: 200%; }
+}
+
+/* แถบสีฟ้าด้านซ้ายที่จะวิ่งขยายตัวออกมาตอนกดเลือก */
+.nav-link::before {
+  content: '';
+  position: absolute;
+  left: -1px;
+  top: 10%;
+  bottom: 10%;
+  width: 4px;
+  background-color: var(--accent);
+  border-radius: 4px;
+  transform: scaleY(0);
+  transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  transform-origin: center;
+}
+
+.nav-link.active::before {
+  transform: scaleY(1);
 }
 
 /* พื้นที่หลัก */
@@ -137,4 +191,123 @@
   background-color: rgba(239, 68, 68, 0.05);
   border-color: rgba(239, 68, 68, 0.3);
   box-shadow: 0 0 20px var(--loss-glow);
+}
+
+/* =========================================
+   สไตล์ปุ่ม Filter (แอนิเมชัน 3D เด้งๆ)
+   ========================================= */
+.filter-btn {
+  padding: 8px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  position: relative;
+  will-change: transform, box-shadow;
+}
+
+/* ตอนเอาเมาส์ชี้: ให้ปุ่มขยายตัว ลอยขึ้นมา และมีเงาเข้มๆ */
+.filter-btn:hover {
+  transform: translateY(-4px) scale(1.05);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
+  z-index: 10;
+}
+
+/* ตอนคลิก: ให้ปุ่มยุบตัวลงไปเหมือนสวิตช์ของจริง */
+.filter-btn:active {
+  transform: translateY(2px) scale(0.95);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* =========================================
+   แอนิเมชันเปลี่ยนหน้า (Page Transitions)
+   ========================================= */
+
+/* สร้าง Keyframes กำหนดการเคลื่อนไหว (จากจาง/หดตัว -> สว่าง/ขนาดปกติ) */
+@keyframes pageEnter {
+  0% {
+    opacity: 0;
+    transform: translateY(20px) scale(0.98); /* เริ่มต้นต่ำลงมา 20px และหดเล็กลง 2% */
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1); /* เด้งกลับมาที่เดิมและขนาดปกติ */
+  }
+}
+
+/* นำแอนิเมชันไปผูกกับคอนเทนเนอร์หลักของทุกหน้า */
+.page-container {
+  /* เรียกใช้แอนิเมชัน pageEnter ความยาว 0.4 วินาที */
+  /* cubic-bezier ช่วยให้จังหวะเด้งดูพรีเมียมและนุ่มนวลกว่า ease ปกติ */
+  animation: pageEnter 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  
+  /* กำหนดจุดศูนย์กลางการขยายตัวให้อยู่ด้านบน */
+  transform-origin: top center; 
+  
+  /* ป้องกันเนื้อหากระตุก */
+  will-change: transform, opacity; 
+}
+
+/* =========================================
+   แอนิเมชันสำหรับตัวละคร (Employee Avatars)
+   ========================================= */
+
+.avatar-container {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  background-color: var(--bg-main);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  position: relative;
+}
+
+/* 1. กำลังทำงาน (พิมพ์คอมก๊อกแก๊ก) */
+.anim-working {
+  animation: typeWork 1s infinite alternate ease-in-out;
+}
+@keyframes typeWork {
+  0% { transform: translateY(0) rotate(0deg); }
+  100% { transform: translateY(-4px) rotate(5deg); }
+}
+
+/* 2. ว่างงาน (โยกจอยเกมไปมา) */
+.anim-playing {
+  animation: playWobble 2s infinite ease-in-out;
+}
+@keyframes playWobble {
+  0%, 100% { transform: rotate(-10deg) scale(1); }
+  50% { transform: rotate(10deg) scale(1.1); }
+}
+
+/* 3. กำลังพัก (หลับหายใจเข้าออก ดุ๊กดิ๊กนิดๆ) */
+.anim-resting {
+  animation: sleepBreathe 3s infinite ease-in-out;
+}
+@keyframes sleepBreathe {
+  0%, 100% { transform: scale(0.95); filter: brightness(0.8); }
+  50% { transform: scale(1.05); filter: brightness(1.1); }
+}
+
+/* 4. ไม่มา (แกว่งป้ายประท้วง/ลางาน) */
+.anim-absent {
+  animation: signSwing 1.5s infinite ease-in-out;
+  transform-origin: bottom center;
+}
+@keyframes signSwing {
+  0%, 100% { transform: rotate(-15deg); }
+  50% { transform: rotate(15deg); }
+}
+
+/* เอฟเฟกต์การ์ดสั่นเบาๆ เฉพาะคนกำลังพัก (ตามที่คุณขอ) */
+.card.resting-card:hover {
+  animation: gentleShake 0.5s ease-in-out;
+}
+@keyframes gentleShake {
+  0%, 100% { transform: translateX(0) translateY(-2px); }
+  25% { transform: translateX(-2px) translateY(-2px) rotate(-1deg); }
+  75% { transform: translateX(2px) translateY(-2px) rotate(1deg); }
 }
