@@ -1,0 +1,1 @@
+{"name":"bizflow-monorepo","private":true,"scripts":{"dev":"pnpm -r --parallel run dev","build":"pnpm -r run build","start":"docker-compose up -d"}}

@@ -1,0 +1,49 @@
+version: "3.8"
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: bizflow-db
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "5432:5432"
+    networks:
+      - bizflow-network
+  api-gateway:
+    build: ./services/api-gateway
+    ports:
+      - "5000:5000"
+    depends_on:
+      - db
+    networks:
+      - bizflow-network
+  admin-app:
+    build: ./apps/admin-app
+    ports:
+      - "3001:3000"
+    networks:
+      - bizflow-network
+  staff-app:
+    build: ./apps/staff-app
+    ports:
+      - "3002:3000"
+    networks:
+      - bizflow-network
+  customer-app:
+    build: ./apps/customer-app
+    ports:
+      - "3003:3000"
+    networks:
+      - bizflow-network
+  dev-portal:
+    build: ./apps/dev-portal
+    ports:
+      - "3004:3000"
+    networks:
+      - bizflow-network
+networks:
+  bizflow-network:
+    driver: bridge
