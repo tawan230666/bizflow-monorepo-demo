@@ -4,7 +4,7 @@ import {
 } from 'recharts';
 
 export default function ReportPage() {
-  // 1. ฐานข้อมูลจำลอง แยกตามช่วงเวลา (วัน, สัปดาห์, เดือน, ปี)
+  // ฐานข้อมูลจำลอง (ยังคงเดิมไว้เพื่อให้ระบบทำงานได้ต่อเนื่อง)
   const dataSets: Record<string, any[]> = {
     daily: [
       { name: '08:00', profit: 800, revenue: 1500, expense: 700, items: [{ id: 1, name: 'กาแฟร้อน', qty: 20, revenue: 1000 }, { id: 2, name: 'แซนด์วิช', qty: 10, revenue: 500 }] },
@@ -37,19 +37,14 @@ export default function ReportPage() {
     ],
   };
 
-  // 2. State จัดการช่วงเวลาที่เลือก
   const [timeframe, setTimeframe] = useState<string>('weekly');
   const activeData = dataSets[timeframe];
-
-  // 3. State จัดการจุดที่กดบนกราฟ
   const [selectedPoint, setSelectedPoint] = useState(activeData[activeData.length - 1]);
 
-  // เมื่อเปลี่ยนช่วงเวลา (Tab) ให้รีเซ็ตจุดที่เลือกเป็นอันล่าสุดของช่วงเวลานั้นเสมอ
   useEffect(() => {
     setSelectedPoint(dataSets[timeframe][dataSets[timeframe].length - 1]);
   }, [timeframe]);
 
-  // คำนวณสถิติภาพรวมเทียบกับจุดก่อนหน้า
   const selectedIndex = activeData.findIndex(d => d.name === selectedPoint.name);
   const currentProfit = selectedPoint.profit;
   const previousProfit = selectedIndex > 0 ? activeData[selectedIndex - 1].profit : currentProfit; 
@@ -58,7 +53,6 @@ export default function ReportPage() {
   const profitPercent = previousProfit > 0 ? (profitDiff / previousProfit) * 100 : 0;
   const isPositive = profitDiff >= 0;
 
-  // จำลองข้อมูลหมวดหมู่ (Bar Chart) ให้ล้อตามช่วงเวลา
   const categoryMultiplier = timeframe === 'daily' ? 1 : timeframe === 'weekly' ? 7 : timeframe === 'monthly' ? 30 : 180;
   const categoryData = [
     { name: 'จานหลัก', profit: 4500 * categoryMultiplier },
@@ -66,12 +60,17 @@ export default function ReportPage() {
     { name: 'ของหวาน', profit: 1400 * categoryMultiplier },
   ];
 
-  // ตั้งค่ากราฟ
-  const chartAxisColor = "#9CA3AF";
-  const chartGridColor = "#2A2F40";
-  const tooltipStyle = { backgroundColor: '#151924', borderColor: '#2A2F40', color: '#F3F4F6', borderRadius: '8px' };
+  // อัปเดตสไตล์กราฟให้เข้ากับธีมใหม่
+  const chartAxisColor = "#71717a"; // text-muted ในธีมใหม่
+  const tooltipStyle = { 
+    backgroundColor: '#18181b', // bg-card
+    borderColor: '#27272a',     // border-light
+    color: '#f4f4f5', 
+    borderRadius: '12px',
+    boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.5)',
+    padding: '12px'
+  };
 
-  // Helper สำหรับชื่อปุ่ม
   const timeframeLabels: Record<string, string> = {
     daily: 'รายวัน',
     weekly: 'รายสัปดาห์',
@@ -81,28 +80,19 @@ export default function ReportPage() {
 
   return (
     <div className="page-container">
-      {/* Header และ แถบเลือกช่วงเวลา (Tabs) */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px', flexWrap: 'wrap', gap: '16px' }}>
-        <h2 style={{ margin: 0 }}>📊 Market Overview & Analytics</h2>
+      {/* =========================================
+          Header & Tabs
+          ========================================= */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: '52px', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }}>
+        <h2 style={{ margin: 0, fontSize: '24px', fontWeight: 600 }}>📊 Analytics & Reports</h2>
         
-        {/* กลุ่มปุ่ม Tab สไตล์พรีเมียม */}
-        <div style={{ display: 'flex', background: '#11151F', padding: '4px', borderRadius: '12px', border: '1px solid #2A2F40' }}>
+        {/* Segmented Control */}
+        <div className="segmented-control">
           {Object.keys(timeframeLabels).map((key) => (
             <button
               key={key}
               onClick={() => setTimeframe(key)}
-              style={{
-                background: timeframe === key ? 'rgba(59, 130, 246, 0.15)' : 'transparent',
-                color: timeframe === key ? '#3B82F6' : '#9CA3AF',
-                border: 'none',
-                padding: '8px 20px',
-                borderRadius: '8px',
-                fontSize: '14px',
-                fontWeight: timeframe === key ? 600 : 500,
-                cursor: 'pointer',
-                transition: 'all 0.2s',
-                fontFamily: 'Inter'
-              }}
+              className={`segmented-btn ${timeframe === key ? 'active' : ''}`}
             >
               {timeframeLabels[key]}
             </button>
@@ -110,34 +100,53 @@ export default function ReportPage() {
         </div>
       </div>
 
-      {/* สถิติรวม */}
-      <div className="finance-cards" style={{ marginBottom: '32px' }}>
-        <div className="card">
-          <h3 style={{ textTransform: 'none' }}>กำไรช่วงนี้ ({selectedPoint.name})</h3>
-          <p className="amount">฿{currentProfit.toLocaleString()}</p>
+      {/* =========================================
+          Summary Cards (ดีไซน์ใหม่)
+          ========================================= */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px', marginBottom: '32px' }}>
+        <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          <span style={{ fontSize: '13px', color: 'var(--text-muted)', fontWeight: 500, textTransform: 'uppercase' }}>
+            กำไรช่วงนี้ ({selectedPoint.name})
+          </span>
+          <span className="mono" style={{ fontSize: '32px', fontWeight: 600, color: 'var(--text-main)', lineHeight: 1 }}>
+            ฿{currentProfit.toLocaleString()}
+          </span>
         </div>
-        <div className="card">
-          <h3 style={{ textTransform: 'none' }}>ช่วงก่อนหน้า</h3>
-          <p className="amount">฿{previousProfit.toLocaleString()}</p>
+
+        <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          <span style={{ fontSize: '13px', color: 'var(--text-muted)', fontWeight: 500, textTransform: 'uppercase' }}>
+            ช่วงก่อนหน้า
+          </span>
+          <span className="mono" style={{ fontSize: '32px', fontWeight: 600, color: 'var(--text-muted)', lineHeight: 1 }}>
+            ฿{previousProfit.toLocaleString()}
+          </span>
         </div>
-        <div className={`card highlight ${isPositive ? 'positive' : 'negative'}`}>
-          <h3 style={{ textTransform: 'none' }}>เติบโต (Growth)</h3>
-          <p className="amount" style={{ color: isPositive ? 'var(--profit)' : 'var(--loss)', display: 'flex', alignItems: 'center' }}>
-            <span style={{ fontSize: '24px', marginRight: '8px' }}>{profitDiff !== 0 ? (isPositive ? '▲' : '▼') : '-'}</span>
-            {isPositive && profitDiff > 0 ? '+' : ''}฿{Math.abs(profitDiff).toLocaleString()} 
-            <span style={{ fontSize: '18px', marginLeft: '12px', opacity: 0.9 }}>
-              ({isPositive && profitDiff > 0 ? '+' : ''}{profitPercent.toFixed(2)}%)
+
+        <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          <span style={{ fontSize: '13px', color: 'var(--text-muted)', fontWeight: 500, textTransform: 'uppercase' }}>
+            เติบโต (Growth)
+          </span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginTop: '2px' }}>
+            <span className={`delta-badge mono ${isPositive ? 'up' : 'down'}`} style={{ fontSize: '16px', padding: '4px 10px' }}>
+              {profitDiff !== 0 ? (isPositive ? '▲' : '▼') : ''} {Math.abs(profitPercent).toFixed(1)}%
             </span>
-          </p>
+            <span className="mono" style={{ fontSize: '20px', color: isPositive ? 'var(--profit)' : 'var(--loss)', fontWeight: 600 }}>
+              {isPositive && profitDiff > 0 ? '+' : ''}฿{Math.abs(profitDiff).toLocaleString()}
+            </span>
+          </div>
         </div>
       </div>
 
-      {/* กราฟ */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '32px', marginBottom: '40px' }}>
+      {/* =========================================
+          Charts Section
+          ========================================= */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '24px', marginBottom: '32px' }}>
         
-        {/* กราฟเส้น */}
-        <div className="card">
-          <h3 style={{ marginBottom: '24px' }}>📈 Profit Trend <span style={{ color: '#3B82F6', fontSize: '12px', fontWeight: 'normal', marginLeft: '8px' }}>(Click points to view details)</span></h3>
+        {/* Line Chart */}
+        <div className="card" style={{ padding: '24px' }}>
+          <h3 style={{ margin: '0 0 24px', fontSize: '14px', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1px' }}>
+            📈 Profit Trend <span style={{ color: 'var(--accent)', fontSize: '11px', fontWeight: 'normal', textTransform: 'none', marginLeft: '8px' }}>(Click points to drill down)</span>
+          </h3>
           <div style={{ width: '100%', height: 320 }}>
             <ResponsiveContainer>
               <LineChart 
@@ -150,71 +159,76 @@ export default function ReportPage() {
                 }}
                 style={{ cursor: 'pointer' }}
               >
-                <CartesianGrid strokeDasharray="3 3" stroke={chartGridColor} vertical={false} />
-                <XAxis dataKey="name" stroke={chartAxisColor} tick={{ fill: chartAxisColor, fontSize: 13 }} />
-                <YAxis stroke={chartAxisColor} tick={{ fill: chartAxisColor, fontSize: 13, fontFamily: 'JetBrains Mono' }} />
-                <Tooltip contentStyle={tooltipStyle} itemStyle={{ color: '#10B981', fontFamily: 'JetBrains Mono' }} formatter={(value: number) => `฿${value}`} />
-                <Legend wrapperStyle={{ paddingTop: '10px' }}/>
+                {/* ลบเส้น Grid แนวตั้งออก เพื่อความสะอาดตา */}
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+                <XAxis dataKey="name" stroke={chartAxisColor} tick={{ fill: chartAxisColor, fontSize: 12, fontFamily: 'DM Sans' }} axisLine={false} tickLine={false} />
+                <YAxis stroke={chartAxisColor} tick={{ fill: chartAxisColor, fontSize: 12, fontFamily: 'DM Mono' }} axisLine={false} tickLine={false} />
+                <Tooltip contentStyle={tooltipStyle} itemStyle={{ color: 'var(--profit)', fontFamily: 'DM Mono', fontWeight: 'bold' }} formatter={(value: number) => `฿${value}`} />
+                <Legend wrapperStyle={{ paddingTop: '20px', fontSize: '12px' }} iconType="circle"/>
                 <Line 
                   type="monotone" 
                   dataKey="profit" 
                   name="Net Profit" 
-                  stroke="#10B981" 
-                  strokeWidth={4} 
-                  dot={{ fill: '#151924', stroke: '#10B981', strokeWidth: 2, r: 6 }}
-                  activeDot={{ r: 9, fill: '#10B981', stroke: '#fff' }} 
+                  stroke="var(--profit)" 
+                  strokeWidth={3} 
+                  dot={{ fill: 'var(--bg-card)', stroke: 'var(--profit)', strokeWidth: 2, r: 5 }}
+                  activeDot={{ r: 8, fill: 'var(--profit)', stroke: '#fff', strokeWidth: 2 }} 
                 />
               </LineChart>
             </ResponsiveContainer>
           </div>
         </div>
 
-        {/* กราฟแท่ง */}
-        <div className="card">
-          <h3 style={{ marginBottom: '24px' }}>📊 Revenue by Category ({timeframeLabels[timeframe]})</h3>
+        {/* Bar Chart */}
+        <div className="card" style={{ padding: '24px' }}>
+          <h3 style={{ margin: '0 0 24px', fontSize: '14px', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1px' }}>
+            📊 Revenue by Category
+          </h3>
           <div style={{ width: '100%', height: 320 }}>
             <ResponsiveContainer>
               <BarChart data={categoryData} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke={chartGridColor} vertical={false} />
-                <XAxis dataKey="name" stroke={chartAxisColor} tick={{ fill: chartAxisColor, fontSize: 13 }} />
-                <YAxis stroke={chartAxisColor} tick={{ fill: chartAxisColor, fontSize: 13, fontFamily: 'JetBrains Mono' }} />
-                <Tooltip contentStyle={tooltipStyle} itemStyle={{ color: '#3B82F6', fontFamily: 'JetBrains Mono' }} formatter={(value: number) => `฿${value}`} />
-                <Legend wrapperStyle={{ paddingTop: '10px' }}/>
-                <Bar dataKey="profit" name="Revenue" fill="#3B82F6" radius={[6, 6, 0, 0]} barSize={40} />
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+                <XAxis dataKey="name" stroke={chartAxisColor} tick={{ fill: chartAxisColor, fontSize: 12, fontFamily: 'DM Sans' }} axisLine={false} tickLine={false} />
+                <YAxis stroke={chartAxisColor} tick={{ fill: chartAxisColor, fontSize: 12, fontFamily: 'DM Mono' }} axisLine={false} tickLine={false} />
+                <Tooltip contentStyle={tooltipStyle} itemStyle={{ color: 'var(--accent)', fontFamily: 'DM Mono', fontWeight: 'bold' }} formatter={(value: number) => `฿${value}`} />
+                <Legend wrapperStyle={{ paddingTop: '20px', fontSize: '12px' }} iconType="circle"/>
+                {/* ใช้สี Accent ใหม่ (Indigo) */}
+                <Bar dataKey="profit" name="Revenue" fill="var(--accent)" radius={[4, 4, 0, 0]} barSize={36} />
               </BarChart>
             </ResponsiveContainer>
           </div>
         </div>
       </div>
 
-      {/* เจาะลึกข้อมูลของจุดที่เลือก (Dynamic) */}
-      <h2 style={{ borderTop: '1px solid var(--border-light)', paddingTop: '32px', color: '#FCD34D' }}>
-        📌 เจาะลึกข้อมูลประจำ: {selectedPoint.name}
+      {/* =========================================
+          Drill Down Table (Data Table ใหม่)
+          ========================================= */}
+      <h2 style={{ fontSize: '18px', margin: '40px 0 20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <span style={{ color: 'var(--accent)' }}>📌 Drill Down:</span> ข้อมูลประจำ {selectedPoint.name}
       </h2>
       
-      <div className="finance-cards" style={{ marginBottom: '24px' }}>
-         <div className="card" style={{ padding: '20px' }}>
-          <h3 style={{ fontSize: '13px' }}>รายได้ (Revenue)</h3>
-          <p className="amount" style={{ fontSize: '28px', color: '#3B82F6' }}>฿{selectedPoint.revenue.toLocaleString()}</p>
-        </div>
-        <div className="card" style={{ padding: '20px' }}>
-          <h3 style={{ fontSize: '13px' }}>รายจ่าย (Expense)</h3>
-          <p className="amount" style={{ fontSize: '28px', color: 'var(--text-muted)' }}>฿{selectedPoint.expense.toLocaleString()}</p>
-        </div>
-        <div className="card" style={{ padding: '20px' }}>
-          <h3 style={{ fontSize: '13px' }}>กำไร (Net Profit)</h3>
-          <p className="amount" style={{ fontSize: '28px', color: 'var(--profit)' }}>฿{selectedPoint.profit.toLocaleString()}</p>
-        </div>
-      </div>
-
       <div className="card" style={{ padding: '0', overflow: 'hidden' }}>
-        <h3 style={{ padding: '24px 24px 0' }}>🔥 รายการอาหารที่ขายได้ (ยอดขายสูงสุดในรอบนี้)</h3>
-        <table className="data-table">
+        <div style={{ padding: '24px', borderBottom: '1px solid var(--border-light)', display: 'flex', gap: '32px', background: 'rgba(255,255,255,0.02)' }}>
+          <div>
+            <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '4px' }}>รายได้ (REVENUE)</div>
+            <div className="mono" style={{ fontSize: '20px', color: 'var(--accent)', fontWeight: 600 }}>฿{selectedPoint.revenue.toLocaleString()}</div>
+          </div>
+          <div>
+            <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '4px' }}>รายจ่าย (EXPENSE)</div>
+            <div className="mono" style={{ fontSize: '20px', color: 'var(--text-muted)', fontWeight: 600 }}>฿{selectedPoint.expense.toLocaleString()}</div>
+          </div>
+          <div>
+            <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '4px' }}>กำไร (NET PROFIT)</div>
+            <div className="mono" style={{ fontSize: '20px', color: 'var(--profit)', fontWeight: 600 }}>฿{selectedPoint.profit.toLocaleString()}</div>
+          </div>
+        </div>
+
+        <table className="modern-table">
           <thead>
             <tr>
-              <th>ลำดับ</th>
-              <th>เมนู</th>
-              <th style={{ textAlign: 'center' }}>จำนวน</th>
+              <th style={{ width: '80px' }}>ลำดับ</th>
+              <th>เมนูอาหาร</th>
+              <th style={{ textAlign: 'center' }}>จำนวนที่ขาย</th>
               <th style={{ textAlign: 'right' }}>รายได้รวม (฿)</th>
             </tr>
           </thead>
@@ -223,12 +237,14 @@ export default function ReportPage() {
               .sort((a, b) => b.revenue - a.revenue)
               .map((item, index) => (
               <tr key={item.id}>
-                <td className="number" style={{ color: 'var(--text-muted)' }}>{index + 1}</td>
-                <td style={{ color: index === 0 ? '#FCD34D' : 'var(--text-main)', fontWeight: index === 0 ? 'bold' : 'normal' }}>
+                <td className="mono" style={{ color: 'var(--text-muted)' }}>0{index + 1}</td>
+                <td style={{ color: index === 0 ? '#FCD34D' : 'var(--text-main)', fontWeight: index === 0 ? 600 : 400 }}>
                   {item.name} {index === 0 && '👑'}
                 </td>
-                <td className="number" style={{ textAlign: 'center' }}>{item.qty.toLocaleString()}</td>
-                <td className="number" style={{ textAlign: 'right', color: 'var(--profit)' }}>{item.revenue.toLocaleString()}</td>
+                <td className="mono" style={{ textAlign: 'center' }}>{item.qty.toLocaleString()}</td>
+                <td className="mono" style={{ textAlign: 'right', color: 'var(--text-main)', fontWeight: 500 }}>
+                  ฿{item.revenue.toLocaleString()}
+                </td>
               </tr>
             ))}
           </tbody>

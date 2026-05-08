@@ -1,23 +1,40 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:opsz,wght@9..40,400;500;600;700&display=swap');
 
 :root {
-  --bg-main: #0B0E14; /* สีพื้นหลังหลัก แบบแอปเทรด */
-  --bg-sidebar: #11151F;
-  --bg-card: #151924;
-  --border-light: #2A2F40;
-  --text-main: #F3F4F6;
-  --text-muted: #9CA3AF;
+  /* Premium Dark Theme Palette (ค่าเริ่มต้น) */
+  --bg-main: #09090b;
+  --bg-sidebar: #09090b;
+  --bg-card: #18181b;
+  --border-light: #27272a;
+  --text-main: #f4f4f5;
+  --text-muted: #a1a1aa;
   
-  --profit: #10B981; /* สีเขียวนักลงทุน */
-  --profit-glow: rgba(16, 185, 129, 0.15);
-  --loss: #EF4444; /* สีแดงนักลงทุน */
-  --loss-glow: rgba(239, 68, 68, 0.15);
-  
-  --accent: #3B82F6;
-  --accent-gold: #F59E0B;
+  --profit: #10b981;
+  --profit-bg: rgba(16, 185, 129, 0.1);
+  --loss: #ef4444;
+  --loss-bg: rgba(239, 68, 68, 0.1);
+  --accent: #6366f1;
+  --accent-bg: rgba(99, 102, 241, 0.1);
+  --warning: #f59e0b;
 
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: 'DM Sans', system-ui, sans-serif;
   color-scheme: dark;
+}
+
+/* 🌟 สไตล์สำหรับ Light Mode (จะทำงานเมื่อ body มี class "light-mode") */
+body.light-mode {
+  --bg-main: #f4f4f5;
+  --bg-sidebar: #ffffff;
+  --bg-card: #ffffff;
+  --border-light: #e4e4e7;
+  --text-main: #18181b;
+  --text-muted: #71717a;
+  
+  --profit-bg: rgba(16, 185, 129, 0.15);
+  --loss-bg: rgba(239, 68, 68, 0.15);
+  --accent-bg: rgba(99, 102, 241, 0.15);
+  
+  color-scheme: light;
 }
 
 body {
@@ -25,6 +42,8 @@ body {
   padding: 0;
   background-color: var(--bg-main);
   color: var(--text-main);
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.3s ease, color 0.3s ease; /* ทำให้เปลี่ยนสีสมูท */
 }
 
 #root {
@@ -33,7 +52,16 @@ body {
   display: flex;
 }
 
-/* ทำให้ตัวเลขทางการเงินดูเป็นระเบียบ */
-.amount, .number {
-  font-family: 'JetBrains Mono', monospace;
+.mono {
+  font-family: 'DM Mono', monospace;
+}
+
+/* Animations */
+@keyframes pageEnter {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.page-container {
+  animation: pageEnter 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform, opacity;
 }

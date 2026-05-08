@@ -1,257 +1,557 @@
+/* ==========================================================================
+   BIZFLOW ADMIN DASHBOARD - MASTER STYLESHEET
+   ========================================================================== 
+   Theme: Premium Dark SaaS (Glassmorphism & Neon Accents)
+   Author: BizFlow UI Team
+   ========================================================================== */
+
+
+/* =========================================
+   1. BASE & SCROLLBAR (พื้นฐานและแถบเลื่อน)
+   ========================================= */
+* {
+  box-sizing: border-box;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-main);
+}
+::-webkit-scrollbar-thumb {
+  background: #3f3f46;
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #52525b;
+}
+
+
+/* =========================================
+   2. MAIN LAYOUT (โครงสร้างหลักของหน้าจอ)
+   ========================================= */
 .admin-layout {
   display: flex;
   min-height: 100vh;
   width: 100vw;
-  text-align: left;
+  overflow: hidden; /* ป้องกันหน้าจอเลื่อนซ้ายขวา */
 }
 
-/* Sidebar สไตล์พรีเมียม */
+.main-content {
+  flex: 1;
+  padding: 32px 40px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  /* เพิ่มพื้นหลังแบบมีแสงส่องสว่างมุมขวาบนเบาๆ ให้ดูแพง */
+  background: radial-gradient(circle at top right, rgba(99, 102, 241, 0.08), transparent 50%), var(--bg-main);
+}
+
+.page-container {
+  max-width: 1440px;
+  margin: 0 auto;
+  /* แอนิเมชันเปิดหน้าใหม่ให้สมูท */
+  animation: pageEnter 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform, opacity; 
+}
+
+
+/* =========================================
+   3. SIDEBAR & NAVIGATION (เมนูด้านซ้าย)
+   ========================================= */
 .sidebar {
   width: 260px;
   background-color: var(--bg-sidebar);
   border-right: 1px solid var(--border-light);
-  padding: 24px;
+  padding: 24px 16px;
   display: flex;
   flex-direction: column;
+  z-index: 50;
+  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.2);
 }
 
-.sidebar h1 {
+.brand-logo {
   font-size: 26px;
-  font-weight: 700;
-  color: var(--text-main);
+  font-weight: 800;
   margin-bottom: 40px;
+  padding: 0 12px;
   letter-spacing: -0.5px;
-  background: linear-gradient(to right, #F59E0B, #FCD34D);
+}
+
+.brand-logo .gradient-text {
+  background: linear-gradient(135deg, #6366f1, #a855f7, #ec4899);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
-/* =========================================
-   สไตล์เมนูด้านซ้าย (Sidebar Nav Links)
-   ========================================= */
+.sidebar-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #71717a;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin: 24px 0 8px 12px;
+}
+
+/* ลิงก์เมนู (Nav Links) */
 .nav-link {
-  display: block;
-  padding: 14px 18px;
-  margin-bottom: 12px;
-  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  margin-bottom: 6px;
+  border-radius: 10px;
   color: var(--text-muted);
   text-decoration: none;
   font-weight: 500;
-  border: 1px solid transparent;
-  
-  /* เพิ่มความสมูทเวลาเคลื่อนที่ */
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  font-size: 14px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
-  overflow: hidden;
+  border: 1px solid transparent;
 }
 
-/* เอฟเฟกต์ตอนเอาเมาส์ชี้ (Hover) - เลื่อนขวาและลอยขึ้น */
+.nav-link svg {
+  color: var(--text-muted);
+  transition: all 0.3s ease;
+}
+
 .nav-link:hover {
-  background-color: rgba(255, 255, 255, 0.03);
+  background-color: rgba(255, 255, 255, 0.04);
   color: var(--text-main);
-  transform: translateX(8px) translateY(-2px);
-  box-shadow: 0 6px 12px -2px rgba(0, 0, 0, 0.3);
+  transform: translateX(6px);
   border-color: rgba(255, 255, 255, 0.05);
 }
 
-/* เอฟเฟกต์ตอนกดเลือกหน้า (Active) */
+.nav-link:hover svg {
+  color: var(--text-main);
+}
+
+/* สถานะเมนูที่ถูกเลือก (Active) */
 .nav-link.active {
-  background-color: rgba(59, 130, 246, 0.1);
-  color: var(--accent); /* สีฟ้า */
-  border: 1px solid rgba(59, 130, 246, 0.2);
-  
-  /* ดันไปทางขวาให้ดูมีเลเยอร์ */
-  transform: translateX(12px); 
-  
-  /* สร้างแถบเรืองแสงสีฟ้าด้านซ้าย และเงาเรืองแสง */
-  box-shadow: inset 4px 0px 0px var(--accent), 0 4px 15px rgba(59, 130, 246, 0.15); 
+  background-color: var(--accent-bg);
+  color: var(--text-main);
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.1);
 }
 
-/* ลูกเล่นแสงวิ่งผ่านตอน Active (ให้ดูเหมือนแอปไฮเทค) */
-.nav-link.active::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 50%;
-  height: 100%;
-  background: linear-gradient(to right, transparent, rgba(59, 130, 246, 0.1), transparent);
-  animation: sweep 2.5s infinite linear;
+.nav-link.active svg {
+  color: var(--accent);
 }
 
-@keyframes sweep {
-  0% { left: -100%; }
-  100% { left: 200%; }
-}
-
-/* แถบสีฟ้าด้านซ้ายที่จะวิ่งขยายตัวออกมาตอนกดเลือก */
-.nav-link::before {
+/* ขีดเรืองแสงสีฟ้าด้านซ้ายมือ */
+.nav-link.active::before {
   content: '';
   position: absolute;
   left: -1px;
-  top: 10%;
-  bottom: 10%;
+  top: 15%;
+  height: 70%;
   width: 4px;
   background-color: var(--accent);
   border-radius: 4px;
-  transform: scaleY(0);
-  transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-  transform-origin: center;
+  box-shadow: 0 0 12px var(--accent);
 }
 
-.nav-link.active::before {
-  transform: scaleY(1);
+
+/* =========================================
+   4. USER PROFILE & NOTIFICATIONS 
+   ========================================= */
+.user-profile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  background: rgba(255,255,255,0.02);
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.05);
+  margin-top: auto;
+  transition: background 0.2s;
 }
 
-/* พื้นที่หลัก */
-.main-content {
-  flex: 1;
-  padding: 40px;
-  overflow-y: auto;
+.user-profile:hover {
+  background: rgba(255,255,255,0.04);
 }
 
-.page-container h2 {
-  font-size: 28px;
-  font-weight: 600;
-  margin-top: 0;
-  margin-bottom: 30px;
-  color: var(--text-main);
-  letter-spacing: -0.5px;
-}
-
-/* ตารางข้อมูล (Data Table) */
-.data-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.data-table th, .data-table td {
-  padding: 16px;
-  text-align: left;
-  border-bottom: 1px solid var(--border-light);
-}
-
-.data-table th {
-  color: var(--text-muted);
-  font-weight: 500;
-  font-size: 14px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.data-table td {
+.user-profile .avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--accent), #a855f7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-weight: bold;
   font-size: 15px;
+  box-shadow: 0 2px 10px rgba(99, 102, 241, 0.4);
 }
 
-/* Dashboard Cards */
+.user-profile .user-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.user-profile .name {
+  color: var(--text-main);
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.user-profile .role {
+  color: var(--text-muted);
+  font-size: 11px;
+}
+
+.logout-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  opacity: 0.6;
+  transition: opacity 0.2s, transform 0.2s;
+  padding: 4px;
+}
+
+.logout-btn:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+.notification-bell {
+  position: relative;
+  cursor: pointer;
+  font-size: 20px;
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 8px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: 50%;
+}
+
+.notification-bell:hover {
+  transform: scale(1.1) rotate(10deg);
+  background: rgba(255,255,255,0.05);
+}
+
+.notification-bell .badge {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  background: var(--loss);
+  color: white;
+  font-size: 10px;
+  font-weight: bold;
+  padding: 2px 6px;
+  border-radius: 10px;
+  border: 2px solid var(--bg-main);
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.4);
+}
+
+
+/* =========================================
+   5. CARDS & CONTAINERS (Glassmorphism)
+   ========================================= */
 .finance-cards {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 24px;
 }
 
+/* การ์ดสไตล์กระจกโปร่งแสง */
 .card {
-  padding: 28px;
+  padding: 24px;
   border-radius: 16px;
-  background-color: var(--bg-card);
-  border: 1px solid var(--border-light);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  transition: transform 0.2s, box-shadow 0.2s;
+  background-color: rgba(24, 24, 27, 0.6);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
+/* เอฟเฟกต์ตอนเมาส์ชี้การ์ด (ลอยขึ้น + เรืองแสงบางๆ) */
 .card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+  transform: translateY(-4px);
+  border-color: rgba(99, 102, 241, 0.3);
+  box-shadow: 
+    0 12px 24px -8px rgba(0, 0, 0, 0.5), 
+    inset 0 0 20px rgba(99, 102, 241, 0.05);
 }
 
 .card h3 {
   margin: 0 0 16px 0;
-  font-size: 15px;
-  font-weight: 500;
+  font-size: 14px;
+  font-weight: 600;
   color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
 .card .amount {
-  font-size: 36px;
+  font-size: 32px;
   font-weight: 700;
   color: var(--text-main);
   margin: 0;
+  font-family: 'DM Mono', monospace;
 }
 
-/* สไตล์การ์ดที่เป็นจุดเด่น (บวก/ลบ) */
-.card.highlight.positive {
-  background-color: rgba(16, 185, 129, 0.05);
-  border-color: rgba(16, 185, 129, 0.3);
-  box-shadow: 0 0 20px var(--profit-glow);
+/* การ์ดแบบมีแสงสว่าง (Insight Card) */
+.insight-card {
+  background: linear-gradient(145deg, rgba(24,24,27,0.8) 0%, rgba(9,9,11,0.9) 100%);
+  position: relative;
+  overflow: hidden;
 }
 
-.card.highlight.negative {
-  background-color: rgba(239, 68, 68, 0.05);
-  border-color: rgba(239, 68, 68, 0.3);
-  box-shadow: 0 0 20px var(--loss-glow);
+.insight-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent), #ec4899, transparent);
+  opacity: 0.8;
 }
+
 
 /* =========================================
-   สไตล์ปุ่ม Filter (แอนิเมชัน 3D เด้งๆ)
+   6. BUTTONS & CONTROLS (ปุ่มกดต่างๆ)
    ========================================= */
+
+/* ปุ่ม Actions ด้านบน */
+.quick-action-btn {
+  flex: 1;
+  min-width: 140px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border-light);
+  border-radius: 12px;
+  color: var(--text-main);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  backdrop-filter: blur(8px);
+}
+
+.quick-action-btn:hover {
+  transform: translateY(-2px);
+  background: rgba(255,255,255,0.08);
+  border-color: var(--text-muted);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+}
+
+.quick-action-btn.primary {
+  background: var(--accent-bg);
+  border-color: rgba(99, 102, 241, 0.3);
+  color: var(--accent);
+}
+
+.quick-action-btn.primary:hover {
+  background: rgba(99, 102, 241, 0.2);
+  box-shadow: 0 6px 15px rgba(99, 102, 241, 0.3);
+}
+
+/* ปุ่ม Filter สไตล์แอปมือถือ */
 .filter-btn {
   padding: 8px 20px;
   border-radius: 8px;
   cursor: pointer;
-  font-family: 'Inter', sans-serif;
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
   position: relative;
   will-change: transform, box-shadow;
+  font-size: 13px;
 }
 
-/* ตอนเอาเมาส์ชี้: ให้ปุ่มขยายตัว ลอยขึ้นมา และมีเงาเข้มๆ */
 .filter-btn:hover {
-  transform: translateY(-4px) scale(1.05);
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
   z-index: 10;
 }
 
-/* ตอนคลิก: ให้ปุ่มยุบตัวลงไปเหมือนสวิตช์ของจริง */
 .filter-btn:active {
-  transform: translateY(2px) scale(0.95);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  transform: translateY(1px);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
+/* Segmented Control (ปุ่มเลือกแท็บสไตล์ iOS) */
+.segmented-control {
+  display: inline-flex;
+  background: rgba(0,0,0,0.3);
+  padding: 4px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.05);
+  box-shadow: inset 0 2px 6px rgba(0,0,0,0.3);
+}
+
+.segmented-btn {
+  padding: 6px 20px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-muted);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.segmented-btn:hover {
+  color: var(--text-main);
+}
+
+.segmented-btn.active {
+  background: var(--bg-card);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  font-weight: 600;
+  border: 1px solid rgba(255,255,255,0.05);
+}
+
+
 /* =========================================
-   แอนิเมชันเปลี่ยนหน้า (Page Transitions)
+   7. BADGES & INDICATORS (ป้ายกำกับและไฟสถานะ)
    ========================================= */
 
-/* สร้าง Keyframes กำหนดการเคลื่อนไหว (จากจาง/หดตัว -> สว่าง/ขนาดปกติ) */
+/* ไฟกะพริบ LIVE */
+.live-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--profit-bg);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  color: var(--profit);
+  font-weight: 600;
+  box-shadow: 0 0 15px rgba(16, 185, 129, 0.1);
+}
+
+.pulse-dot {
+  width: 8px;
+  height: 8px;
+  background-color: var(--profit);
+  border-radius: 50%;
+  box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+  animation: pulse 1.5s infinite;
+}
+
+/* ป้ายบอกเปอร์เซ็นต์ขึ้นลง (Delta) */
+.delta-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 6px;
+}
+.delta-badge.up { background: var(--profit-bg); color: var(--profit); }
+.delta-badge.down { background: var(--loss-bg); color: var(--loss); }
+
+
+/* =========================================
+   8. TABLES & DATA DISPLAYS (ตารางข้อมูล)
+   ========================================= */
+.data-table, .modern-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.modern-table th, .data-table th {
+  text-align: left;
+  padding: 16px 20px;
+  font-size: 12px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border-light);
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.modern-table td, .data-table td {
+  padding: 16px 20px;
+  font-size: 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  color: var(--text-main);
+  transition: background-color 0.2s ease;
+}
+
+.modern-table tbody tr, .data-table tbody tr {
+  transition: all 0.2s ease;
+}
+
+.modern-table tbody tr:hover, .data-table tbody tr:hover {
+  background-color: rgba(255, 255, 255, 0.03);
+}
+
+/* ลบขอบล่างของแถวสุดท้ายให้ดูสะอาด */
+.modern-table tbody tr:last-child td, .data-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+
+/* =========================================
+   9. CUSTOM WIDGETS (กราฟและลูกเล่นอื่นๆ)
+   ========================================= */
+
+/* Heatmap Bars */
+.heatmap-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 10px;
+}
+.heatmap-label {
+  width: 45px;
+  font-size: 13px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+.heatmap-bar-bg {
+  flex: 1;
+  height: 8px;
+  background: rgba(0,0,0,0.3);
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);
+}
+.heatmap-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #3B82F6, #a855f7);
+  transition: width 1s ease-out;
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+}
+
+
+/* =========================================
+   10. ANIMATIONS & KEYFRAMES (การเคลื่อนไหว)
+   ========================================= */
+
 @keyframes pageEnter {
   0% {
     opacity: 0;
-    transform: translateY(20px) scale(0.98); /* เริ่มต้นต่ำลงมา 20px และหดเล็กลง 2% */
+    transform: translateY(15px) scale(0.99);
   }
   100% {
     opacity: 1;
-    transform: translateY(0) scale(1); /* เด้งกลับมาที่เดิมและขนาดปกติ */
+    transform: translateY(0) scale(1);
   }
 }
 
-/* นำแอนิเมชันไปผูกกับคอนเทนเนอร์หลักของทุกหน้า */
-.page-container {
-  /* เรียกใช้แอนิเมชัน pageEnter ความยาว 0.4 วินาที */
-  /* cubic-bezier ช่วยให้จังหวะเด้งดูพรีเมียมและนุ่มนวลกว่า ease ปกติ */
-  animation: pageEnter 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
-  
-  /* กำหนดจุดศูนย์กลางการขยายตัวให้อยู่ด้านบน */
-  transform-origin: top center; 
-  
-  /* ป้องกันเนื้อหากระตุก */
-  will-change: transform, opacity; 
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6); }
+  70% { box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
 }
 
-/* =========================================
-   แอนิเมชันสำหรับตัวละคร (Employee Avatars)
-   ========================================= */
-
+/* Avatar Animations (หน้าจัดการพนักงาน) */
 .avatar-container {
   width: 50px;
   height: 50px;
@@ -259,40 +559,30 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 28px;
+  font-size: 26px;
   background-color: var(--bg-main);
   box-shadow: 0 4px 10px rgba(0,0,0,0.3);
   position: relative;
 }
 
-/* 1. กำลังทำงาน (พิมพ์คอมก๊อกแก๊ก) */
-.anim-working {
-  animation: typeWork 1s infinite alternate ease-in-out;
-}
+.anim-working { animation: typeWork 1s infinite alternate ease-in-out; }
 @keyframes typeWork {
   0% { transform: translateY(0) rotate(0deg); }
   100% { transform: translateY(-4px) rotate(5deg); }
 }
 
-/* 2. ว่างงาน (โยกจอยเกมไปมา) */
-.anim-playing {
-  animation: playWobble 2s infinite ease-in-out;
-}
+.anim-playing { animation: playWobble 2s infinite ease-in-out; }
 @keyframes playWobble {
   0%, 100% { transform: rotate(-10deg) scale(1); }
   50% { transform: rotate(10deg) scale(1.1); }
 }
 
-/* 3. กำลังพัก (หลับหายใจเข้าออก ดุ๊กดิ๊กนิดๆ) */
-.anim-resting {
-  animation: sleepBreathe 3s infinite ease-in-out;
-}
+.anim-resting { animation: sleepBreathe 3s infinite ease-in-out; }
 @keyframes sleepBreathe {
   0%, 100% { transform: scale(0.95); filter: brightness(0.8); }
   50% { transform: scale(1.05); filter: brightness(1.1); }
 }
 
-/* 4. ไม่มา (แกว่งป้ายประท้วง/ลางาน) */
 .anim-absent {
   animation: signSwing 1.5s infinite ease-in-out;
   transform-origin: bottom center;
@@ -302,12 +592,9 @@
   50% { transform: rotate(15deg); }
 }
 
-/* เอฟเฟกต์การ์ดสั่นเบาๆ เฉพาะคนกำลังพัก (ตามที่คุณขอ) */
-.card.resting-card:hover {
-  animation: gentleShake 0.5s ease-in-out;
-}
+.card.resting-card:hover { animation: gentleShake 0.5s ease-in-out; }
 @keyframes gentleShake {
-  0%, 100% { transform: translateX(0) translateY(-2px); }
-  25% { transform: translateX(-2px) translateY(-2px) rotate(-1deg); }
-  75% { transform: translateX(2px) translateY(-2px) rotate(1deg); }
+  0%, 100% { transform: translateX(0) translateY(-4px); }
+  25% { transform: translateX(-2px) translateY(-4px) rotate(-1deg); }
+  75% { transform: translateX(2px) translateY(-4px) rotate(1deg); }
 }
