@@ -15,8 +15,8 @@ const masterMenu = [
 
 const branchData = {
   bkk: { name: 'กรุงเทพฯ (HQ)', items: ['M001', 'M002', 'M003', 'M004', 'M005', 'M006', 'M007'] },
-  cnx: { name: 'เชียงใหม่', items: ['M001', 'M002', 'M004', 'M007'] }, // ไม่มีต้มยำ, โซดา, เค้ก
-  hkt: { name: 'ภูเก็ต', items: ['M001', 'M003', 'M004', 'M005'] } // ไม่มีกะเพรา, เค้ก, ข้าวผัด
+  cnx: { name: 'เชียงใหม่', items: ['M001', 'M002', 'M004', 'M007'] },
+  hkt: { name: 'ภูเก็ต', items: ['M001', 'M003', 'M004', 'M005'] }
 };
 
 export default function MenuPage() {
@@ -24,7 +24,6 @@ export default function MenuPage() {
   const [selectedBranch, setSelectedBranch] = useState('bkk');
   const [searchQuery, setSearchQuery] = useState('');
 
-  // กรองเมนูหลักตามการค้นหา
   const filteredMasterMenu = useMemo(() => {
     return masterMenu.filter(item => 
       item.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
@@ -55,11 +54,10 @@ export default function MenuPage() {
       </div>
 
       {/* =========================================
-          2. CONTROLS & TABS (แท็บเลือกหน้า)
+          2. CONTROLS & TABS
           ========================================= */}
       <div className="card" style={{ padding: '16px 24px', marginBottom: '24px', display: 'flex', gap: '16px', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between' }}>
         
-        {/* Segmented Control (Tabs) */}
         <div className="segmented-control">
           <button 
             className={`segmented-btn ${activeTab === 'master' ? 'active' : ''}`} 
@@ -75,9 +73,8 @@ export default function MenuPage() {
           </button>
         </div>
 
-        {/* เครื่องมือด้านขวา เปลี่ยนไปตามแท็บที่เลือก */}
         {activeTab === 'master' ? (
-          <div style={{ display: 'flex', alignItems: 'center', background: 'var(--bg-main)', border: '1px solid var(--border-light)', borderRadius: '8px', padding: '8px 16px', width: '300px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', background: 'var(--bg-surface)', border: '1px solid var(--border-light)', borderRadius: '8px', padding: '8px 16px', width: '300px' }}>
             <span style={{ color: 'var(--text-muted)', marginRight: '8px' }}>🔍</span>
             <input 
               type="text" 
@@ -93,7 +90,7 @@ export default function MenuPage() {
             <select 
               value={selectedBranch} 
               onChange={(e) => setSelectedBranch(e.target.value)}
-              style={{ padding: '10px 16px', borderRadius: '8px', border: '1px solid var(--border-light)', background: 'var(--bg-main)', color: 'var(--text-main)', outline: 'none', cursor: 'pointer', fontWeight: 600, fontFamily: 'inherit' }}
+              style={{ padding: '10px 16px', borderRadius: '8px', border: '1px solid var(--border-light)', background: 'var(--bg-surface)', color: 'var(--text-main)', outline: 'none', cursor: 'pointer', fontWeight: 600, fontFamily: 'inherit' }}
             >
               <option value="bkk">📍 กรุงเทพฯ (HQ)</option>
               <option value="cnx">📍 เชียงใหม่</option>
@@ -104,7 +101,7 @@ export default function MenuPage() {
       </div>
 
       {/* =========================================
-          3. TAB 1: MASTER MENU (ตารางเมนูหลัก)
+          3. TAB 1: MASTER MENU
           ========================================= */}
       {activeTab === 'master' && (
         <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
@@ -125,7 +122,7 @@ export default function MenuPage() {
                   <td className="mono" style={{ color: 'var(--text-muted)' }}>{item.id}</td>
                   <td style={{ fontWeight: 600 }}>{item.name}</td>
                   <td>
-                    <span style={{ background: 'var(--bg-main)', padding: '4px 10px', borderRadius: '6px', fontSize: '12px', border: '1px solid var(--border-light)' }}>
+                    <span style={{ background: 'var(--bg-surface)', padding: '4px 10px', borderRadius: '6px', fontSize: '12px', border: '1px solid var(--border-light)' }}>
                       {item.category}
                     </span>
                   </td>
@@ -141,29 +138,21 @@ export default function MenuPage() {
                     </span>
                   </td>
                   <td style={{ textAlign: 'right' }}>
-                    <button className="filter-btn" style={{ background: 'transparent', border: '1px solid var(--border-light)', color: 'var(--text-main)' }}>แก้ไข</button>
+                    <button className="filter-btn" style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-light)', color: 'var(--text-main)' }}>แก้ไข</button>
                   </td>
                 </tr>
               ))}
-              {filteredMasterMenu.length === 0 && (
-                <tr>
-                  <td colSpan={6} style={{ textAlign: 'center', padding: '60px 20px', color: 'var(--text-muted)' }}>
-                    <div style={{ fontSize: '32px', marginBottom: '16px' }}>🍽️</div>
-                    ไม่พบเมนูอาหารที่ค้นหา
-                  </td>
-                </tr>
-              )}
             </tbody>
           </table>
         </div>
       )}
 
       {/* =========================================
-          4. TAB 2: BRANCH SPECIFIC MENU (ตารางสาขา)
+          4. TAB 2: BRANCH MENU
           ========================================= */}
       {activeTab === 'branch' && (
         <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
-          <div style={{ padding: '20px 24px', background: 'var(--bg-main)', borderBottom: '1px solid var(--border-light)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ padding: '20px 24px', background: 'var(--bg-surface)', borderBottom: '1px solid var(--border-light)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div>
               <h3 style={{ margin: '0 0 4px', fontSize: '16px', color: 'var(--text-main)', textTransform: 'none' }}>
                 รายการที่เปิดขายใน <span style={{ color: 'var(--accent)' }}>{branchData[selectedBranch as keyof typeof branchData].name}</span>
@@ -203,15 +192,6 @@ export default function MenuPage() {
                   </td>
                 </tr>
               ))}
-              
-              {/* กรณีสาขานั้นไม่มีรายการอาหารเลย */}
-              {masterMenu.filter(m => branchData[selectedBranch as keyof typeof branchData].items.includes(m.id)).length === 0 && (
-                <tr>
-                  <td colSpan={5} style={{ textAlign: 'center', padding: '60px', color: 'var(--text-muted)' }}>
-                    ยังไม่มีการเพิ่มเมนูสำหรับสาขานี้
-                  </td>
-                </tr>
-              )}
             </tbody>
           </table>
         </div>

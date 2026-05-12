@@ -21,6 +21,9 @@
   --warning: #f59e0b;
   --warning-bg: rgba(245, 158, 11, 0.12);
   --shadow-soft: 0 24px 80px rgba(0, 0, 0, 0.25);
+  
+  /* ตัวแปรสีพื้นหลังปุ่ม (Dark Mode) */
+  --btn-bg: rgba(255, 255, 255, 0.04);
 }
 
 html {
@@ -41,6 +44,12 @@ body.light-mode {
   color-scheme: light;
   background: linear-gradient(180deg, #eef2ff 0%, #dbeafe 100%);
   color: #0f172a;
+  
+  /* อัปเดตตัวแปรสำหรับ Light Mode */
+  --text-main: #0f172a;
+  --bg-card: rgba(255, 255, 255, 0.92);
+  --border-light: rgba(148, 163, 184, 0.25);
+  --btn-bg: rgba(255, 255, 255, 0.9);
 }
 
 body.light-mode .admin-layout,
@@ -253,40 +262,6 @@ body.light-mode .nav-link.active {
   backdrop-filter: blur(18px);
 }
 
-.btn-outline {
-  background: rgba(255, 255, 255, 0.04);
-  color: var(--text-main);
-  border: 1px solid rgba(103, 232, 249, 0.18);
-  padding: 10px 18px;
-  border-radius: 12px;
-  font-weight: 600;
-  font-size: 13px;
-  cursor: pointer;
-  transition: 0.2s, transform 0.2s;
-}
-.btn-outline:hover {
-  background: rgba(103, 232, 249, 0.12);
-  transform: translateY(-1px);
-}
-
-.quick-action-btn {
-  background: var(--bg-card);
-  color: var(--text-main);
-  border: 1px solid var(--border-light);
-  padding: 12px 20px;
-  border-radius: 12px;
-  font-weight: 600;
-  font-size: 14px;
-  cursor: pointer;
-  transition: 0.2s;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.quick-action-btn:hover { background: rgba(255, 255, 255, 0.05); transform: translateY(-2px); }
-.quick-action-btn.primary { background: var(--text-main); color: var(--bg-main); border: none; }
-.quick-action-btn.primary:hover { opacity: 0.9; }
-
 .modern-table { width: 100%; border-collapse: collapse; }
 .modern-table th { text-align: left; padding: 16px; font-size: 12px; color: var(--text-muted); border-bottom: 1px solid var(--border-light); text-transform: uppercase; font-weight: 600; }
 .modern-table td { padding: 16px; font-size: 14px; color: var(--text-main); border-bottom: 1px solid var(--border-light); }
@@ -298,6 +273,47 @@ body.light-mode .nav-link.active {
 .segmented-btn.active { background: var(--bg-card); color: var(--text-main); box-shadow: 0 2px 8px rgba(0,0,0,0.2); border: 1px solid var(--border-light); }
 .filter-btn { background: transparent; border: 1px solid var(--border-light); padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; color: var(--text-main); cursor: pointer; transition: 0.2s; }
 .filter-btn:hover { background: rgba(255, 255, 255, 0.05); }
+
+/* =========================================
+   Buttons & Quick Actions (อัปเดตใหม่)
+   ========================================= */
+.quick-action-btn, .btn-outline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: var(--btn-bg); /* ใช้ตัวแปรสีพื้นหลัง */
+  color: var(--text-main); /* ใช้ตัวแปรสีข้อความ */
+  border: 1px solid var(--border-light);
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.quick-action-btn:hover, .btn-outline:hover {
+  background: var(--bg-card); /* ดึงสีการ์ดมาใช้ตอน Hover */
+  border-color: var(--text-muted);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* ปุ่มหลัก (Primary) สำหรับปุ่มที่สำคัญที่สุด */
+.quick-action-btn.primary {
+  background: var(--accent);
+  color: #ffffff; /* บังคับสีขาวเสมอเพราะพื้นหลังสีเข้ม */
+  border: none;
+  box-shadow: 0 4px 15px var(--accent-bg);
+}
+
+.quick-action-btn.primary:hover {
+  background: #38bdf8; /* สี Accent สว่างขึ้นตอน Hover */
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px var(--accent-bg);
+}
 
 /* =========================================
    5. LOGIN PAGE
@@ -395,7 +411,6 @@ body.light-mode .nav-link.active {
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* STYLES ADDED BY COPILOT */
 .login-logo {
   font-size: 32px;
   font-weight: 900;
