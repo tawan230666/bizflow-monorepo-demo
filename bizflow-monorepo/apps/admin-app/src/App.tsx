@@ -2,19 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, NavLink, Navigate, Outlet } from 'react-router-dom';
 import LoginPage from './pages/LoginPage';
 import OverviewPage from './pages/OverviewPage';
-import EmployeePage from './pages/EmployeePage';
 import FinancePage from './pages/FinancePage';
 import ReportPage from './pages/ReportPage';
 import MenuPage from './pages/MenuPage';
 import './App.css';
 
-// ==========================================
-// 1. Layout ของระบบหลังบ้าน (มี Sidebar + Topbar)
-// ==========================================
+// 1. สร้าง Layout สำหรับแอปหลัก (ที่มี Sidebar & Topbar)
 function DashboardLayout({ isDarkMode, setIsDarkMode }: any) {
   return (
     <div className="admin-layout">
-      {/* ฝั่งซ้าย: SIDEBAR */}
+      {/* SIDEBAR */}
       <aside className="sidebar">
         <div className="brand-logo">
           <span style={{ color: 'var(--accent)', marginRight: '4px' }}>Biz</span>Flow
@@ -23,7 +20,7 @@ function DashboardLayout({ isDarkMode, setIsDarkMode }: any) {
         <nav className="nav-menu">
           <div className="sidebar-label">Dashboards</div>
           <NavLink to="/overview" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
-            <span style={{ fontSize: '18px' }}>⊞</span> Overview
+            <span style={{ fontSize: '18px' }}>⊞</span> Dashboard
           </NavLink>
           <NavLink to="/report" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
             <span style={{ fontSize: '18px' }}>📈</span> Analytics
@@ -36,22 +33,16 @@ function DashboardLayout({ isDarkMode, setIsDarkMode }: any) {
           <NavLink to="/menu" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
             <span style={{ fontSize: '18px' }}>🍽️</span> Menu
           </NavLink>
-          <NavLink to="/employee" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
-            <span style={{ fontSize: '18px' }}>👥</span> Team
-          </NavLink>
         </nav>
       </aside>
 
-      {/* ฝั่งขวา: พื้นที่ทำงานหลัก */}
+      {/* MAIN CONTENT */}
       <div className="main-wrapper">
-        
-        {/* แถบด้านบน: TOPBAR */}
         <header className="topbar">
           <div className="search-box">
             <span>🔍</span>
             <input type="text" placeholder="Search..." />
           </div>
-          
           <div className="topbar-actions">
             <button 
               onClick={() => setIsDarkMode(!isDarkMode)} 
@@ -60,30 +51,24 @@ function DashboardLayout({ isDarkMode, setIsDarkMode }: any) {
             >
               {isDarkMode ? '☀️ Light' : '🌙 Dark'}
             </button>
-
             <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'var(--text-main)', color: 'var(--bg-main)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>
               A
             </div>
           </div>
         </header>
 
-        {/* เนื้อหาหน้าเพจ: CONTENT */}
-        <main className="main-content">
+        <main className="content-area">
           <Outlet />
         </main>
-
       </div>
     </div>
   );
 }
 
-// ==========================================
-// 2. ระบบ Routing สลับหน้าจอ
-// ==========================================
+// 2. จัดการ Routing
 export default function App() {
   const [isDarkMode, setIsDarkMode] = useState(true);
 
-  // สลับโหมดสี
   useEffect(() => {
     if (isDarkMode) {
       document.body.classList.remove('light-mode');
@@ -95,17 +80,20 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* หน้า Login แบบเต็มจอ (ไม่มี Layout) */}
         <Route path="/login" element={<LoginPage />} />
 
-        {/* หน้าอื่นๆ ใช้ DashboardLayout คลุมทั้งหมด */}
         <Route element={<DashboardLayout isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />}>
+          {/* ลิงก์เริ่มต้น */}
           <Route path="/" element={<Navigate to="/login" replace />} />
+          
+          {/* หน้าทั้งหมดที่มี */}
           <Route path="/overview" element={<OverviewPage />} />
           <Route path="/menu" element={<MenuPage />} />
-          <Route path="/employee" element={<EmployeePage />} />
           <Route path="/finance" element={<FinancePage />} />
           <Route path="/report" element={<ReportPage />} />
+          
+          {/* ตัวกันตาย: ถ้าผู้ใช้เข้า URL ที่ไม่มีอยู่จริง ให้เด้งกลับมาหน้า Overview */}
+          <Route path="*" element={<Navigate to="/overview" replace />} />
         </Route>
       </Routes>
     </BrowserRouter>
