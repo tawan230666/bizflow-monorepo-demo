@@ -1,16 +1,89 @@
-import { useState, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, NavLink } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter, Routes, Route, NavLink, Navigate, Outlet } from 'react-router-dom';
+import LoginPage from './pages/LoginPage';
+import OverviewPage from './pages/OverviewPage';
 import EmployeePage from './pages/EmployeePage';
 import FinancePage from './pages/FinancePage';
 import ReportPage from './pages/ReportPage';
-import OverviewPage from './pages/OverviewPage';
+import MenuPage from './pages/MenuPage';
 import './App.css';
 
-function App() {
-  // สร้าง State สำหรับควบคุมโหมดมืด/สว่าง (เริ่มต้นเป็น Dark)
+// ==========================================
+// 1. Layout ของระบบหลังบ้าน (มี Sidebar + Topbar)
+// ==========================================
+function DashboardLayout({ isDarkMode, setIsDarkMode }: any) {
+  return (
+    <div className="admin-layout">
+      {/* ฝั่งซ้าย: SIDEBAR */}
+      <aside className="sidebar">
+        <div className="brand-logo">
+          <span style={{ color: 'var(--accent)', marginRight: '4px' }}>Biz</span>Flow
+        </div>
+        
+        <nav className="nav-menu">
+          <div className="sidebar-label">Dashboards</div>
+          <NavLink to="/overview" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+            <span style={{ fontSize: '18px' }}>⊞</span> Overview
+          </NavLink>
+          <NavLink to="/report" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+            <span style={{ fontSize: '18px' }}>📈</span> Analytics
+          </NavLink>
+          
+          <div className="sidebar-label" style={{ marginTop: '16px' }}>Management</div>
+          <NavLink to="/finance" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+            <span style={{ fontSize: '18px' }}>💰</span> Deals
+          </NavLink>
+          <NavLink to="/menu" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+            <span style={{ fontSize: '18px' }}>🍽️</span> Menu
+          </NavLink>
+          <NavLink to="/employee" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+            <span style={{ fontSize: '18px' }}>👥</span> Team
+          </NavLink>
+        </nav>
+      </aside>
+
+      {/* ฝั่งขวา: พื้นที่ทำงานหลัก */}
+      <div className="main-wrapper">
+        
+        {/* แถบด้านบน: TOPBAR */}
+        <header className="topbar">
+          <div className="search-box">
+            <span>🔍</span>
+            <input type="text" placeholder="Search..." />
+          </div>
+          
+          <div className="topbar-actions">
+            <button 
+              onClick={() => setIsDarkMode(!isDarkMode)} 
+              className="btn-outline"
+              title="Toggle Dark/Light Mode"
+            >
+              {isDarkMode ? '☀️ Light' : '🌙 Dark'}
+            </button>
+
+            <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'var(--text-main)', color: 'var(--bg-main)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>
+              A
+            </div>
+          </div>
+        </header>
+
+        {/* เนื้อหาหน้าเพจ: CONTENT */}
+        <main className="main-content">
+          <Outlet />
+        </main>
+
+      </div>
+    </div>
+  );
+}
+
+// ==========================================
+// 2. ระบบ Routing สลับหน้าจอ
+// ==========================================
+export default function App() {
   const [isDarkMode, setIsDarkMode] = useState(true);
 
-  // ดักจับการเปลี่ยนแปลง: ถ้ากดเปลี่ยน ให้เพิ่มหรือลบ class "light-mode" ที่แท็ก <body>
+  // สลับโหมดสี
   useEffect(() => {
     if (isDarkMode) {
       document.body.classList.remove('light-mode');
@@ -21,62 +94,20 @@ function App() {
 
   return (
     <BrowserRouter>
-      <div className="admin-layout">
-        <aside className="sidebar">
-          <div className="brand-logo">
-            <span className="gradient-text">Biz</span>Flow
-          </div>
+      <Routes>
+        {/* หน้า Login แบบเต็มจอ (ไม่มี Layout) */}
+        <Route path="/login" element={<LoginPage />} />
 
-          <nav style={{ flex: 1 }}>
-            <div className="sidebar-label">Dashboards</div>
-            <NavLink to="/overview" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
-              <span style={{ fontSize: '16px' }}>⌘</span> Overview
-            </NavLink>
-            <NavLink to="/report" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
-              <span style={{ fontSize: '16px' }}>◱</span> Reports
-            </NavLink>
-
-            <div className="sidebar-label" style={{ marginTop: '24px' }}>Management</div>
-            <NavLink to="/employee" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
-              <span style={{ fontSize: '16px' }}>⚇</span> Staff & Roles
-            </NavLink>
-            <NavLink to="/finance" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
-              <span style={{ fontSize: '16px' }}>⎍</span> Finance
-            </NavLink>
-          </nav>
-
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px', background: 'var(--bg-card)', borderRadius: '8px', border: '1px solid var(--border-light)' }}>
-            <div style={{ width: '32px', height: '32px', borderRadius: '6px', background: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 'bold', fontSize: '14px' }}>
-              A
-            </div>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: '13px', color: 'var(--text-main)', fontWeight: 600 }}>Admin User</div>
-              <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Owner</div>
-            </div>
-            
-            {/* ปุ่มกดสลับโหมด 🌙 / ☀️ */}
-            <button 
-              className="logout-btn" 
-              onClick={() => setIsDarkMode(!isDarkMode)}
-              title={isDarkMode ? "เปลี่ยนเป็นโหมดสว่าง" : "เปลี่ยนเป็นโหมดมืด"}
-            >
-              {isDarkMode ? '☀️' : '🌙'}
-            </button>
-          </div>
-        </aside>
-
-        <main className="main-content">
-          <Routes>
-            <Route path="/" element={<OverviewPage />} />
-            <Route path="/overview" element={<OverviewPage />} />
-            <Route path="/employee" element={<EmployeePage />} />
-            <Route path="/finance" element={<FinancePage />} />
-            <Route path="/report" element={<ReportPage />} />
-          </Routes>
-        </main>
-      </div>
+        {/* หน้าอื่นๆ ใช้ DashboardLayout คลุมทั้งหมด */}
+        <Route element={<DashboardLayout isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />}>
+          <Route path="/" element={<Navigate to="/login" replace />} />
+          <Route path="/overview" element={<OverviewPage />} />
+          <Route path="/menu" element={<MenuPage />} />
+          <Route path="/employee" element={<EmployeePage />} />
+          <Route path="/finance" element={<FinancePage />} />
+          <Route path="/report" element={<ReportPage />} />
+        </Route>
+      </Routes>
     </BrowserRouter>
   );
 }
-
-export default App;

@@ -1,67 +1,66 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:opsz,wght@9..40,400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
 
 :root {
-  /* Premium Dark Theme Palette (ค่าเริ่มต้น) */
-  --bg-main: #09090b;
-  --bg-sidebar: #09090b;
-  --bg-card: #18181b;
-  --border-light: #27272a;
+  /* =========================================
+     🌙 DARK MODE (ค่าเริ่มต้น)
+     ========================================= */
+  --bg-body: #09090b;
+  --bg-surface: #121214;
+  --border: #27272a;
+  --border-focus: #3f3f46;
   --text-main: #f4f4f5;
   --text-muted: #a1a1aa;
   
-  --profit: #10b981;
-  --profit-bg: rgba(16, 185, 129, 0.1);
-  --loss: #ef4444;
-  --loss-bg: rgba(239, 68, 68, 0.1);
-  --accent: #6366f1;
-  --accent-bg: rgba(99, 102, 241, 0.1);
-  --warning: #f59e0b;
-
-  font-family: 'DM Sans', system-ui, sans-serif;
+  --primary: #ffffff;
+  --primary-text: #000000;
+  
+  --success: #10B981;
+  --success-bg: rgba(16, 185, 129, 0.15);
+  --danger: #EF4444;
+  --danger-bg: rgba(239, 68, 68, 0.15);
+  --warning: #F59E0B;
+  --warning-bg: rgba(245, 158, 11, 0.15);
+  
   color-scheme: dark;
 }
 
-/* 🌟 สไตล์สำหรับ Light Mode (จะทำงานเมื่อ body มี class "light-mode") */
 body.light-mode {
-  --bg-main: #f4f4f5;
-  --bg-sidebar: #ffffff;
-  --bg-card: #ffffff;
-  --border-light: #e4e4e7;
-  --text-main: #18181b;
-  --text-muted: #71717a;
+  /* =========================================
+     ☀️ LIGHT MODE
+     ========================================= */
+  --bg-body: #F9FAFB;
+  --bg-surface: #FFFFFF;
+  --border: #E5E7EB;
+  --border-focus: #D1D5DB;
+  --text-main: #111827;
+  --text-muted: #6B7280;
   
-  --profit-bg: rgba(16, 185, 129, 0.15);
-  --loss-bg: rgba(239, 68, 68, 0.15);
-  --accent-bg: rgba(99, 102, 241, 0.15);
+  --primary: #111827;
+  --primary-text: #ffffff;
+  
+  --success: #10B981;
+  --success-bg: #D1FAE5;
+  --danger: #EF4444;
+  --danger-bg: #FEE2E2;
+  --warning: #F59E0B;
+  --warning-bg: #FEF3C7;
   
   color-scheme: light;
 }
 
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
 body {
-  margin: 0;
-  padding: 0;
-  background-color: var(--bg-main);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  background-color: var(--bg-body);
   color: var(--text-main);
-  -webkit-font-smoothing: antialiased;
-  transition: background-color 0.3s ease, color 0.3s ease; /* ทำให้เปลี่ยนสีสมูท */
+  overflow: hidden; /* ป้องกันหน้าจอเลื่อนซ้ายขวา */
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-#root {
-  width: 100%;
-  min-height: 100vh;
-  display: flex;
-}
+.mono { font-family: 'DM Mono', monospace; }
 
-.mono {
-  font-family: 'DM Mono', monospace;
-}
-
-/* Animations */
-@keyframes pageEnter {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-.page-container {
-  animation: pageEnter 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  will-change: transform, opacity;
-}
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }

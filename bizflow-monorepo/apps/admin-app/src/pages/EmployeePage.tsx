@@ -73,9 +73,9 @@ export default function EmployeePage() {
         <button 
           onClick={() => setIsAddModalOpen(true)}
           style={{
-            background: 'var(--accent)', color: '#fff', border: 'none', padding: '10px 24px', 
-            borderRadius: '8px', fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s',
-            boxShadow: '0 4px 14px rgba(170, 59, 255, 0.3)', display: 'flex', alignItems: 'center', gap: '8px'
+            background: 'var(--text-main)', color: 'var(--bg-surface)', border: 'none', padding: '10px 24px', 
+    borderRadius: '8px', fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s',
+    display: 'flex', alignItems: 'center', gap: '8px'
           }}
         >
           <span style={{ fontSize: '18px' }}>+</span> เพิ่มพนักงานใหม่

@@ -24,35 +24,52 @@ export default function FinancePage() {
 
   return (
     <div className="page-container">
-      <h2>💰 งบกำไรขาดทุน (P&L)</h2>
       
-      {/* การ์ดสรุปยอด */}
-      <div className="finance-cards">
+      {/* =========================================
+          HEADER
+          ========================================= */}
+      <div className="page-header">
+        <h2>💰 งบกำไรขาดทุน (P&L)</h2>
+        <button className="btn-outline">📥 Export Report</button>
+      </div>
+      
+      {/* =========================================
+          KPI CARDS (สรุปยอดการเงิน)
+          ========================================= */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px', marginBottom: '32px' }}>
         <div className="card">
-          <h3>รายได้รวม</h3>
-          <p className="amount">฿{financeData.revenue.toLocaleString()}</p>
+          <div className="kpi-title">รายได้รวม (Total Revenue)</div>
+          <div className="kpi-value mono">฿{financeData.revenue.toLocaleString()}</div>
         </div>
+        
         <div className="card">
-          <h3>รายจ่ายรวม</h3>
-          <p className="amount">฿{financeData.expenses.toLocaleString()}</p>
+          <div className="kpi-title">รายจ่ายรวม (Total Expenses)</div>
+          <div className="kpi-value mono" style={{ color: 'var(--text-muted)' }}>฿{financeData.expenses.toLocaleString()}</div>
         </div>
-        <div className={`card highlight ${isProfit ? 'positive' : 'negative'}`}>
-          <h3>กำไร (ขาดทุน) สุทธิ</h3>
-          <p 
-            className="amount" 
-            style={{ color: isProfit ? 'var(--profit)' : 'var(--loss)' }}
-          >
+        
+        {/* การ์ดกำไร/ขาดทุน จะไฮไลท์สีพื้นหลังตามสถานะ */}
+        <div className="card" style={{ 
+          border: `1px solid ${isProfit ? 'var(--profit)' : 'var(--loss)'}40`, 
+          background: isProfit ? 'var(--profit-bg)' : 'var(--loss-bg)' 
+        }}>
+          <div className="kpi-title" style={{ color: isProfit ? 'var(--profit)' : 'var(--loss)' }}>กำไรสุทธิ (Net Profit)</div>
+          <div className="kpi-value mono" style={{ color: isProfit ? 'var(--profit)' : 'var(--loss)' }}>
             {isProfit ? '+' : ''}฿{netProfit.toLocaleString()}
-          </p>
+          </div>
         </div>
       </div>
 
-      {/* ตารางข้อมูล */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px', marginTop: '32px' }}>
+      {/* =========================================
+          TABLES (ตารางข้อมูล 2 ฝั่ง)
+          ========================================= */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '24px' }}>
         
-        <div className="card" style={{ padding: '0', overflow: 'hidden' }}>
-          <h3 style={{ padding: '24px 24px 0' }}>📊 ที่มาของรายได้</h3>
-          <table className="data-table">
+        {/* ตารางที่ 1: ที่มาของรายได้ */}
+        <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
+          <div style={{ padding: '20px 24px', borderBottom: '1px solid var(--border-light)', background: 'var(--bg-body)' }}>
+            <h3 style={{ margin: 0, fontSize: '15px', color: 'var(--text-main)' }}>📊 ที่มาของรายได้ (Revenue Sources)</h3>
+          </div>
+          <table className="modern-table">
             <thead>
               <tr>
                 <th>หมวดหมู่</th>
@@ -62,30 +79,39 @@ export default function FinancePage() {
             <tbody>
               {incomeSources.map(source => (
                 <tr key={source.id}>
-                  <td>{source.category}</td>
-                  <td className="number" style={{ textAlign: 'right' }}>{source.amount.toLocaleString()}</td>
+                  <td style={{ fontWeight: 600 }}>{source.category}</td>
+                  <td className="mono" style={{ textAlign: 'right', fontWeight: 600, color: 'var(--text-main)' }}>
+                    ฿{source.amount.toLocaleString()}
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
 
-        <div className="card" style={{ padding: '0', overflow: 'hidden' }}>
-          <h3 style={{ padding: '24px 24px 0' }}>🔥 อาหารที่ขายดีที่สุด</h3>
-          <table className="data-table">
+        {/* ตารางที่ 2: เมนูขายดีที่สุด */}
+        <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
+          <div style={{ padding: '20px 24px', borderBottom: '1px solid var(--border-light)', background: 'var(--bg-body)' }}>
+            <h3 style={{ margin: 0, fontSize: '15px', color: 'var(--text-main)' }}>🔥 อาหารที่ขายดีที่สุด (Top Items)</h3>
+          </div>
+          <table className="modern-table">
             <thead>
               <tr>
                 <th>เมนู</th>
-                <th style={{ textAlign: 'center' }}>จำนวน</th>
+                <th style={{ textAlign: 'center' }}>จำนวน (จาน/แก้ว)</th>
                 <th style={{ textAlign: 'right' }}>รายได้ (฿)</th>
               </tr>
             </thead>
             <tbody>
-              {topItems.sort((a, b) => b.qty - a.qty).map(item => (
+              {topItems.sort((a, b) => b.qty - a.qty).map((item, index) => (
                 <tr key={item.id}>
-                  <td>{item.name}</td>
-                  <td className="number" style={{ textAlign: 'center', color: 'var(--text-muted)' }}>{item.qty}</td>
-                  <td className="number" style={{ textAlign: 'right', color: 'var(--profit)' }}>{item.revenue.toLocaleString()}</td>
+                  <td style={{ fontWeight: 600, color: index === 0 ? 'var(--warning)' : 'var(--text-main)' }}>
+                    {item.name} {index === 0 && '👑'}
+                  </td>
+                  <td className="mono" style={{ textAlign: 'center', color: 'var(--text-muted)' }}>{item.qty}</td>
+                  <td className="mono" style={{ textAlign: 'right', color: 'var(--profit)', fontWeight: 600 }}>
+                    ฿{item.revenue.toLocaleString()}
+                  </td>
                 </tr>
               ))}
             </tbody>
