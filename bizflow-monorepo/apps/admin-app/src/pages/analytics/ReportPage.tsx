@@ -1,10 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
-  LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
+  LineChart,
+  Line,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer
 } from 'recharts';
 
 export default function ReportPage() {
-  // ฐานข้อมูลจำลอง (ยังคงเดิมไว้เพื่อให้ระบบทำงานได้ต่อเนื่อง)
   const dataSets: Record<string, any[]> = {
     daily: [
       { name: '08:00', profit: 800, revenue: 1500, expense: 700, items: [{ id: 1, name: 'กาแฟร้อน', qty: 20, revenue: 1000 }, { id: 2, name: 'แซนด์วิช', qty: 10, revenue: 500 }] },
@@ -47,8 +55,7 @@ export default function ReportPage() {
 
   const selectedIndex = activeData.findIndex(d => d.name === selectedPoint.name);
   const currentProfit = selectedPoint.profit;
-  const previousProfit = selectedIndex > 0 ? activeData[selectedIndex - 1].profit : currentProfit; 
-  
+  const previousProfit = selectedIndex > 0 ? activeData[selectedIndex - 1].profit : currentProfit;
   const profitDiff = currentProfit - previousProfit;
   const profitPercent = previousProfit > 0 ? (profitDiff / previousProfit) * 100 : 0;
   const isPositive = profitDiff >= 0;
@@ -60,12 +67,11 @@ export default function ReportPage() {
     { name: 'ของหวาน', profit: 1400 * categoryMultiplier },
   ];
 
-  // อัปเดตสไตล์กราฟให้เข้ากับธีมใหม่
-  const chartAxisColor = "#71717a"; // text-muted ในธีมใหม่
-  const tooltipStyle = { 
-    backgroundColor: '#18181b', // bg-card
-    borderColor: '#27272a',     // border-light
-    color: '#f4f4f5', 
+  const chartAxisColor = '#71717a';
+  const tooltipStyle = {
+    backgroundColor: '#18181b',
+    borderColor: '#27272a',
+    color: '#f4f4f5',
     borderRadius: '12px',
     boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.5)',
     padding: '12px'
@@ -80,13 +86,8 @@ export default function ReportPage() {
 
   return (
     <div className="page-container">
-      {/* =========================================
-          Header & Tabs
-          ========================================= */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: '52px', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }}>
-        <h2 style={{ margin: 0, fontSize: '24px', fontWeight: 600 }}>📊 Analytics & Reports</h2>
-        
-        {/* Segmented Control */}
+        <h2 style={{ margin: 0, fontSize: '24px', fontWeight: 600 }}>� Marketing & CRM</h2>
         <div className="segmented-control">
           {Object.keys(timeframeLabels).map((key) => (
             <button
@@ -100,90 +101,44 @@ export default function ReportPage() {
         </div>
       </div>
 
-      {/* =========================================
-          Summary Cards (ดีไซน์ใหม่)
-          ========================================= */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px', marginBottom: '32px' }}>
         <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          <span style={{ fontSize: '13px', color: 'var(--text-muted)', fontWeight: 500, textTransform: 'uppercase' }}>
-            กำไรช่วงนี้ ({selectedPoint.name})
-          </span>
-          <span className="mono" style={{ fontSize: '32px', fontWeight: 600, color: 'var(--text-main)', lineHeight: 1 }}>
-            ฿{currentProfit.toLocaleString()}
-          </span>
+          <span style={{ fontSize: '13px', color: 'var(--text-muted)', fontWeight: 500, textTransform: 'uppercase' }}>กำไรช่วงนี้ ({selectedPoint.name})</span>
+          <span className="mono" style={{ fontSize: '32px', fontWeight: 600, color: 'var(--text-main)', lineHeight: 1 }}>฿{currentProfit.toLocaleString()}</span>
         </div>
 
         <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          <span style={{ fontSize: '13px', color: 'var(--text-muted)', fontWeight: 500, textTransform: 'uppercase' }}>
-            ช่วงก่อนหน้า
-          </span>
-          <span className="mono" style={{ fontSize: '32px', fontWeight: 600, color: 'var(--text-muted)', lineHeight: 1 }}>
-            ฿{previousProfit.toLocaleString()}
-          </span>
+          <span style={{ fontSize: '13px', color: 'var(--text-muted)', fontWeight: 500, textTransform: 'uppercase' }}>ช่วงก่อนหน้า</span>
+          <span className="mono" style={{ fontSize: '32px', fontWeight: 600, color: 'var(--text-muted)', lineHeight: 1 }}>฿{previousProfit.toLocaleString()}</span>
         </div>
 
         <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          <span style={{ fontSize: '13px', color: 'var(--text-muted)', fontWeight: 500, textTransform: 'uppercase' }}>
-            เติบโต (Growth)
-          </span>
+          <span style={{ fontSize: '13px', color: 'var(--text-muted)', fontWeight: 500, textTransform: 'uppercase' }}>เติบโต</span>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginTop: '2px' }}>
-            <span className={`delta-badge mono ${isPositive ? 'up' : 'down'}`} style={{ fontSize: '16px', padding: '4px 10px' }}>
-              {profitDiff !== 0 ? (isPositive ? '▲' : '▼') : ''} {Math.abs(profitPercent).toFixed(1)}%
-            </span>
-            <span className="mono" style={{ fontSize: '20px', color: isPositive ? 'var(--profit)' : 'var(--loss)', fontWeight: 600 }}>
-              {isPositive && profitDiff > 0 ? '+' : ''}฿{Math.abs(profitDiff).toLocaleString()}
-            </span>
+            <span className={`delta-badge mono ${isPositive ? 'up' : 'down'}`} style={{ fontSize: '16px', padding: '4px 10px' }}>{profitDiff !== 0 ? (isPositive ? '▲' : '▼') : ''} {Math.abs(profitPercent).toFixed(1)}%</span>
+            <span className="mono" style={{ fontSize: '20px', color: isPositive ? 'var(--profit)' : 'var(--loss)', fontWeight: 600 }}>{isPositive && profitDiff > 0 ? '+' : ''}฿{Math.abs(profitDiff).toLocaleString()}</span>
           </div>
         </div>
       </div>
 
-      {/* =========================================
-          Charts Section
-          ========================================= */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '24px', marginBottom: '32px' }}>
-        
-        {/* Line Chart */}
         <div className="card" style={{ padding: '24px' }}>
-          <h3 style={{ margin: '0 0 24px', fontSize: '14px', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1px' }}>
-            📈 Profit Trend <span style={{ color: 'var(--accent)', fontSize: '11px', fontWeight: 'normal', textTransform: 'none', marginLeft: '8px' }}>(Click points to drill down)</span>
-          </h3>
+          <h3 style={{ margin: '0 0 24px', fontSize: '14px', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1px' }}>📈 Profit Trend</h3>
           <div style={{ width: '100%', height: 320 }}>
             <ResponsiveContainer>
-              <LineChart 
-                data={activeData} 
-                margin={{ top: 5, right: 20, bottom: 5, left: 0 }}
-                onClick={(state) => {
-                  if (state && state.activePayload) {
-                    setSelectedPoint(state.activePayload[0].payload);
-                  }
-                }}
-                style={{ cursor: 'pointer' }}
-              >
-                {/* ลบเส้น Grid แนวตั้งออก เพื่อความสะอาดตา */}
+              <LineChart data={activeData} margin={{ top: 5, right: 20, bottom: 5, left: 0 }} onClick={(state) => { if (state && state.activePayload) { setSelectedPoint(state.activePayload[0].payload); } }} style={{ cursor: 'pointer' }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
                 <XAxis dataKey="name" stroke={chartAxisColor} tick={{ fill: chartAxisColor, fontSize: 12, fontFamily: 'DM Sans' }} axisLine={false} tickLine={false} />
                 <YAxis stroke={chartAxisColor} tick={{ fill: chartAxisColor, fontSize: 12, fontFamily: 'DM Mono' }} axisLine={false} tickLine={false} />
                 <Tooltip contentStyle={tooltipStyle} itemStyle={{ color: 'var(--profit)', fontFamily: 'DM Mono', fontWeight: 'bold' }} formatter={(value: number) => `฿${value}`} />
                 <Legend wrapperStyle={{ paddingTop: '20px', fontSize: '12px' }} iconType="circle"/>
-                <Line 
-                  type="monotone" 
-                  dataKey="profit" 
-                  name="Net Profit" 
-                  stroke="var(--profit)" 
-                  strokeWidth={3} 
-                  dot={{ fill: 'var(--bg-card)', stroke: 'var(--profit)', strokeWidth: 2, r: 5 }}
-                  activeDot={{ r: 8, fill: 'var(--profit)', stroke: '#fff', strokeWidth: 2 }} 
-                />
+                <Line type="monotone" dataKey="profit" name="Net Profit" stroke="var(--profit)" strokeWidth={3} dot={{ fill: 'var(--bg-card)', stroke: 'var(--profit)', strokeWidth: 2, r: 5 }} activeDot={{ r: 8, fill: 'var(--profit)', stroke: '#fff', strokeWidth: 2 }} />
               </LineChart>
             </ResponsiveContainer>
           </div>
         </div>
-
-        {/* Bar Chart */}
         <div className="card" style={{ padding: '24px' }}>
-          <h3 style={{ margin: '0 0 24px', fontSize: '14px', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1px' }}>
-            📊 Revenue by Category
-          </h3>
+          <h3 style={{ margin: '0 0 24px', fontSize: '14px', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1px' }}>📊 Revenue by Category</h3>
           <div style={{ width: '100%', height: 320 }}>
             <ResponsiveContainer>
               <BarChart data={categoryData} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
@@ -192,7 +147,6 @@ export default function ReportPage() {
                 <YAxis stroke={chartAxisColor} tick={{ fill: chartAxisColor, fontSize: 12, fontFamily: 'DM Mono' }} axisLine={false} tickLine={false} />
                 <Tooltip contentStyle={tooltipStyle} itemStyle={{ color: 'var(--accent)', fontFamily: 'DM Mono', fontWeight: 'bold' }} formatter={(value: number) => `฿${value}`} />
                 <Legend wrapperStyle={{ paddingTop: '20px', fontSize: '12px' }} iconType="circle"/>
-                {/* ใช้สี Accent ใหม่ (Indigo) */}
                 <Bar dataKey="profit" name="Revenue" fill="var(--accent)" radius={[4, 4, 0, 0]} barSize={36} />
               </BarChart>
             </ResponsiveContainer>
@@ -200,13 +154,7 @@ export default function ReportPage() {
         </div>
       </div>
 
-      {/* =========================================
-          Drill Down Table (Data Table ใหม่)
-          ========================================= */}
-      <h2 style={{ fontSize: '18px', margin: '40px 0 20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-        <span style={{ color: 'var(--accent)' }}>📌 Drill Down:</span> ข้อมูลประจำ {selectedPoint.name}
-      </h2>
-      
+      <h2 style={{ fontSize: '18px', margin: '40px 0 20px', display: 'flex', alignItems: 'center', gap: '8px' }}><span style={{ color: 'var(--accent)' }}>📌 Drill Down:</span> ข้อมูลประจำ {selectedPoint.name}</h2>
       <div className="card" style={{ padding: '0', overflow: 'hidden' }}>
         <div style={{ padding: '24px', borderBottom: '1px solid var(--border-light)', display: 'flex', gap: '32px', background: 'rgba(255,255,255,0.02)' }}>
           <div>
@@ -222,7 +170,6 @@ export default function ReportPage() {
             <div className="mono" style={{ fontSize: '20px', color: 'var(--profit)', fontWeight: 600 }}>฿{selectedPoint.profit.toLocaleString()}</div>
           </div>
         </div>
-
         <table className="modern-table">
           <thead>
             <tr>
@@ -233,24 +180,17 @@ export default function ReportPage() {
             </tr>
           </thead>
           <tbody>
-            {[...selectedPoint.items]
-              .sort((a, b) => b.revenue - a.revenue)
-              .map((item, index) => (
+            {[...selectedPoint.items].sort((a, b) => b.revenue - a.revenue).map((item, index) => (
               <tr key={item.id}>
                 <td className="mono" style={{ color: 'var(--text-muted)' }}>0{index + 1}</td>
-                <td style={{ color: index === 0 ? '#FCD34D' : 'var(--text-main)', fontWeight: index === 0 ? 600 : 400 }}>
-                  {item.name} {index === 0 && '👑'}
-                </td>
+                <td style={{ color: index === 0 ? '#FCD34D' : 'var(--text-main)', fontWeight: index === 0 ? 600 : 400 }}>{item.name} {index === 0 && '👑'}</td>
                 <td className="mono" style={{ textAlign: 'center' }}>{item.qty.toLocaleString()}</td>
-                <td className="mono" style={{ textAlign: 'right', color: 'var(--text-main)', fontWeight: 500 }}>
-                  ฿{item.revenue.toLocaleString()}
-                </td>
+                <td className="mono" style={{ textAlign: 'right', color: 'var(--text-main)', fontWeight: 500 }}>฿{item.revenue.toLocaleString()}</td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
-
     </div>
   );
 }

@@ -4,6 +4,7 @@ import LoginPage from './pages/LoginPage';
 import OverviewPage from './pages/analytics/OverviewPage';
 import FinancePage from './pages/analytics/FinancePage';
 import ReportPage from './pages/analytics/ReportPage';
+import SettingsPage from './pages/SettingsPage';
 import MenuPage from './pages/MenuPage';
 import './App.css';
 
@@ -19,20 +20,18 @@ function DashboardLayout({ isDarkMode, setIsDarkMode }: any) {
         </div>
 
         <nav className="nav-menu">
-          <div className="sidebar-label">Dashboards</div>
+          <div className="sidebar-label">Executive</div>
           <NavLink to="/overview" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
-            <span style={{ fontSize: '18px' }}>⊞</span> Dashboard
+            <span style={{ fontSize: '18px' }}>⊞</span> Overview
           </NavLink>
-          <NavLink to="/report" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
-            <span style={{ fontSize: '18px' }}>📈</span> Analytics
-          </NavLink>
-          
-          <div className="sidebar-label" style={{ marginTop: '16px' }}>Management</div>
           <NavLink to="/finance" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
-            <span style={{ fontSize: '18px' }}>💰</span> Finance
+            <span style={{ fontSize: '18px' }}>💰</span> Finance & Accounting
           </NavLink>
           <NavLink to="/menu" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
-            <span style={{ fontSize: '18px' }}>🍽️</span> Menu
+            <span style={{ fontSize: '18px' }}>🏪</span> Franchise / Branch Management
+          </NavLink>
+          <NavLink to="/report" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+            <span style={{ fontSize: '18px' }}>📣</span> Marketing & CRM
           </NavLink>
         </nav>
       </aside>
