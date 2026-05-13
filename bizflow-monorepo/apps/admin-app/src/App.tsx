@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, NavLink, Navigate, Outlet } from 'react-router-dom';
 import LoginPage from './pages/LoginPage';
-import OverviewPage from './pages/OverviewPage';
-import FinancePage from './pages/FinancePage';
-import ReportPage from './pages/ReportPage';
+import OverviewPage from './pages/analytics/OverviewPage';
+import FinancePage from './pages/analytics/FinancePage';
+import ReportPage from './pages/analytics/ReportPage';
 import MenuPage from './pages/MenuPage';
 import './App.css';
 
