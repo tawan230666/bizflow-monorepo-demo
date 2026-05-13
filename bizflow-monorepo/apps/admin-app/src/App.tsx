@@ -4,7 +4,7 @@ import LoginPage from './pages/LoginPage';
 import OverviewPage from './pages/analytics/OverviewPage';
 import FinancePage from './pages/analytics/FinancePage';
 import ReportPage from './pages/analytics/ReportPage';
-import MenuPage from './pages/MenuPage';
+import MenuPage from './pages/operations/MenuPage';
 import SettingsPage from './pages/SettingsPage';
 import './App.css';
 
