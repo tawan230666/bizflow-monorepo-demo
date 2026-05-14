@@ -10,8 +10,10 @@ export const createApp = () => {
   app.use(
     cors({
       origin: [
-        "http://localhost:3003", // Customer App (แอปฝั่งลูกค้า)
-        "http://localhost:3000", // สมมติว่าคุณมีแอป Admin/Staff อยู่ที่นี่ด้วย
+        "http://localhost:3003",
+        "http://localhost:3000",
+        "http://localhost:4000",
+        "http://localhost:4001",
       ],
       credentials: true, // จำเป็นต้องเปิดไว้ถ้าคุณมีการส่ง cookies หรือ authorization headers
       methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
