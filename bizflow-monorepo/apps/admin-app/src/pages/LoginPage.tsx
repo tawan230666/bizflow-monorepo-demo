@@ -4,18 +4,12 @@ import { useNavigate } from 'react-router-dom';
 export default function LoginPage() {
   const navigate = useNavigate();
   
-  // State สลับหน้า Sign In / Sign Up
   const [isRegistering, setIsRegistering] = useState(false);
-
-  // State สำหรับฟอร์ม
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  
-  // State เพิ่มเติมสำหรับข้อมูลส่วนบุคคล (สมัครสมาชิก)
   const [fullName, setFullName] = useState('');
   const [phone, setPhone] = useState('');
 
-  // ฟังก์ชัน: สมัครสมาชิก (ลงทะเบียน)
   const handleRegister = (e: React.FormEvent) => {
     e.preventDefault();
     const existingUsers = JSON.parse(localStorage.getItem('bizflow_users') || '[]');
@@ -43,38 +37,35 @@ export default function LoginPage() {
     setPassword('');
   };
 
-  // ฟังก์ชัน: เข้าสู่ระบบผ่าน Email ปกติ
+  // 🚀 แก้ไขฟังก์ชัน Login: ให้ดึงข้อมูลล่าสุดจากหน้า Settings มาใช้ตรวจสอบ
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // ดึงค่าล่าสุดที่ถูกเซฟมาจากหน้า Settings (ถ้าไม่มีให้ใช้ค่าเริ่มต้น)
+    const currentAdminEmail = localStorage.getItem('bizflow_profile_email') || 'admin@bizflow.com';
+    const currentAdminPassword = localStorage.getItem('bizflow_profile_password') || '12345678';
+
     const existingUsers = JSON.parse(localStorage.getItem('bizflow_users') || '[]');
     const foundUser = existingUsers.find((user: any) => user.email === email && user.password === password);
 
-    if (foundUser || (email === 'admin@bizflow.com' && password === '12345678')) {
+    // เช็กว่าใช่อีเมล/รหัสจากหน้า Settings หรือไม่ (หรือเป็น User ที่สมัครใหม่)
+    if (foundUser || (email === currentAdminEmail && password === currentAdminPassword)) {
       localStorage.setItem('bizflow_session', email);
       setTimeout(() => navigate('/overview'), 500);
     } else {
-      alert('อีเมลหรือรหัสผ่านไม่ถูกต้อง!');
+      alert('อีเมลหรือรหัสผ่านไม่ถูกต้อง! (กรุณาเช็กว่าคุณเพิ่งเปลี่ยนรหัสผ่านในหน้า Settings หรือไม่)');
     }
   };
 
-  // 🚀 ฟังก์ชัน: เข้าสู่ระบบด้วย Social Accounts (Google, LINE, Apple)
   const handleSocialLogin = (provider: string) => {
-    // จำลองการล็อกอินสำเร็จผ่าน Social
     localStorage.setItem('bizflow_session', `${provider.toLowerCase()}_user@bizflow.com`);
-    
-    // สามารถเซ็ตชื่อให้ตรงกับ Provider ที่กดได้ด้วย
     localStorage.setItem('bizflow_profile_name', `${provider} User`);
-    
-    // หน่วงเวลาจำลองการโหลด แล้วพาเข้าหน้า Dashboard
-    setTimeout(() => {
-      navigate('/overview');
-    }, 500);
+    setTimeout(() => navigate('/overview'), 500);
   };
 
   return (
     <div className="login-wrapper">
       
-      {/* ฝั่งซ้าย: ฟอร์ม Login / Register */}
       <div className="login-left">
         <div className="login-logo">BizFlow</div>
         
@@ -153,7 +144,6 @@ export default function LoginPage() {
             </button>
           </form>
 
-          {/* 🚀 เพิ่มส่วน Social Login */}
           <div style={{ display: 'flex', alignItems: 'center', margin: '24px 0', gap: '16px' }}>
             <div style={{ flex: 1, height: '1px', background: 'rgba(255, 255, 255, 0.1)' }}></div>
             <span style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 600, letterSpacing: '0.5px' }}>
@@ -163,7 +153,6 @@ export default function LoginPage() {
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px' }}>
-            {/* Google */}
             <button 
               onClick={() => handleSocialLogin('Google')} 
               style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '12px', borderRadius: '14px', border: '1px solid rgba(255, 255, 255, 0.1)', background: 'rgba(255, 255, 255, 0.03)', cursor: 'pointer', transition: '0.2s' }} 
@@ -172,8 +161,6 @@ export default function LoginPage() {
             >
               <span style={{ background: 'linear-gradient(45deg, #4285F4, #34A853, #FBBC05, #EA4335)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', fontWeight: 900, fontSize: '18px' }}>G</span>
             </button>
-            
-            {/* LINE */}
             <button 
               onClick={() => handleSocialLogin('LINE')} 
               style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '12px', borderRadius: '14px', border: '1px solid rgba(6, 199, 85, 0.2)', background: 'rgba(6, 199, 85, 0.08)', color: '#06C755', cursor: 'pointer', transition: '0.2s', fontSize: '18px' }} 
@@ -182,8 +169,6 @@ export default function LoginPage() {
             >
               💬
             </button>
-            
-            {/* Apple */}
             <button 
               onClick={() => handleSocialLogin('Apple')} 
               style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '12px', borderRadius: '14px', border: '1px solid rgba(255, 255, 255, 0.15)', background: 'rgba(255, 255, 255, 0.1)', color: '#fff', cursor: 'pointer', transition: '0.2s', fontSize: '20px' }} 
@@ -193,9 +178,7 @@ export default function LoginPage() {
               
             </button>
           </div>
-          {/* สิ้นสุดส่วน Social Login */}
 
-          {/* ปุ่มสลับหน้า (Toggle) ระหว่าง Login <-> Register */}
           <p style={{ textAlign: 'center', marginTop: '32px', fontSize: '13px', color: 'var(--text-muted)' }}>
             {isRegistering ? 'Already have an account? ' : "Don't have an account? "}
             <button 
@@ -211,11 +194,9 @@ export default function LoginPage() {
         </div>
       </div>
 
-      {/* ฝั่งขวา: กราฟิกตกแต่ง */}
       <div className="login-right">
         <div className="login-pattern"></div>
         
-        {/* Mockup จำลองหน้า Dashboard ลอยๆ */}
         <div className="card" style={{ width: '80%', height: '60%', background: 'var(--bg-surface)', borderRadius: '24px', boxShadow: '0 24px 50px -12px rgba(0,0,0,0.1)', position: 'relative', zIndex: 10, display: 'flex', flexDirection: 'column', padding: '32px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '32px' }}>
             <div style={{ width: '40%', height: '24px', background: 'var(--bg-body)', borderRadius: '6px' }}></div>

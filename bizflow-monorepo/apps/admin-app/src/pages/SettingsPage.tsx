@@ -89,6 +89,7 @@ export default function SettingsPage() {
     triggerToast('บันทึกสำเร็จ', 'ข้อมูลส่วนตัวของคุณถูกอัปเดตเรียบร้อยแล้ว');
   };
 
+  // 🚀 แก้ไขฟังก์ชันอัปเดตรหัสผ่าน ให้บันทึกลง LocalStorage จริงๆ
   const handleUpdatePassword = () => {
     if (!isSecurityDirty) return;
     if (!currentPassword || !newPassword || !confirmPassword) {
@@ -99,10 +100,14 @@ export default function SettingsPage() {
       alert('⚠️ รหัสผ่านใหม่และยืนยันรหัสผ่านไม่ตรงกัน');
       return;
     }
+    
+    // บันทึกรหัสผ่านใหม่ลงระบบความจำของบราวเซอร์
+    localStorage.setItem('bizflow_profile_password', newPassword);
+
     setCurrentPassword('');
     setNewPassword('');
     setConfirmPassword('');
-    triggerToast('เปลี่ยนรหัสผ่านสำเร็จ', 'ระบบได้ทำการอัปเดตรหัสผ่านใหม่ของคุณแล้ว');
+    triggerToast('เปลี่ยนรหัสผ่านสำเร็จ', 'ระบบได้ทำการอัปเดตรหัสผ่านใหม่ของคุณแล้ว (สามารถใช้ล็อกอินครั้งหน้าได้เลย)');
   };
 
   const handleToggleConnection = (provider: 'google' | 'line' | 'apple') => {
@@ -297,7 +302,7 @@ export default function SettingsPage() {
             </div>
           )}
 
-          {/* 🚀 --- TAB: NOTIFICATIONS --- */}
+          {/* --- TAB: NOTIFICATIONS --- */}
           {activeTab === 'notifications' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', animation: 'pageEnter 0.3s ease-out' }}>
               <div>
@@ -341,10 +346,10 @@ export default function SettingsPage() {
             </div>
           )}
 
-          {/* 🚀 --- TAB: LANGUAGE --- */}
+          {/* --- TAB: LANGUAGE --- */}
           {activeTab === 'language' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', animation: 'pageEnter 0.3s ease-out' }}>
-              <div>
+              <div >
                 <h3 style={{ margin: 0, fontSize: '18px', color: 'var(--text-main)' }}>ตั้งค่าภาษา (Language & Region)</h3>
                 <p style={{ margin: '8px 0 0', fontSize: '14px', color: 'var(--text-muted)' }}>เปลี่ยนภาษาที่แสดงผลบนระบบแดชบอร์ด</p>
               </div>
@@ -435,7 +440,7 @@ export default function SettingsPage() {
             </div>
           )}
 
-          {/* 🚀 --- TAB: TERMS OF SERVICE --- */}
+          {/* --- TAB: TERMS OF SERVICE --- */}
           {activeTab === 'terms' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', animation: 'pageEnter 0.3s ease-out' }}>
               <div>
@@ -461,7 +466,7 @@ export default function SettingsPage() {
             </div>
           )}
 
-          {/* 🚀 --- TAB: ABOUT BIZFLOW --- */}
+          {/* --- TAB: ABOUT BIZFLOW --- */}
           {activeTab === 'about' && (
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '24px', animation: 'pageEnter 0.3s ease-out', textAlign: 'center', minHeight: '400px' }}>
               
