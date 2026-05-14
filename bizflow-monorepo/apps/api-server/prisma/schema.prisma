@@ -1,0 +1,154 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// ============== ENUMS ==============
+
+enum TableStatus {
+  available
+  occupied
+  reserved
+}
+
+enum OrderStatusEnum {
+  pending
+  cooking
+  served
+  paid
+}
+
+enum OptionTypeEnum {
+  radio
+  checkbox
+}
+
+enum PaymentMethodEnum {
+  promptpay
+  cash
+}
+
+enum PaymentStatusEnum {
+  pending
+  paid
+  failed
+}
+
+enum AdminRole {
+  admin
+  kitchen
+  cashier
+}
+
+// ============== MODELS ==============
+
+model Admin {
+  id        Int       @id @default(autoincrement())
+  username  String    @unique @db.VarChar(50)
+  password  String    @db.VarChar(255)
+  name      String    @db.VarChar(100)
+  role      AdminRole @default(admin)
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  @@map("admins")
+}
+
+model Table {
+  id          Int         @id @default(autoincrement())
+  tableNumber Int         @unique @map("table_number")
+  qrCode      String?     @map("qr_code")
+  status      TableStatus @default(available)
+  createdAt   DateTime    @default(now()) @map("created_at")
+  orders      Order[]
+
+  @@map("tables")
+}
+
+model Category {
+  id        Int        @id @default(autoincrement())
+  name      String     @db.VarChar(100)
+  sortOrder Int        @default(0) @map("sort_order")
+  menuItems MenuItem[]
+
+  @@map("categories")
+}
+
+model MenuItem {
+  id          Int          @id @default(autoincrement())
+  categoryId  Int          @map("category_id")
+  name        String       @db.VarChar(200)
+  description String       @db.Text
+  imageUrl    String       @map("image_url") @db.VarChar(500)
+  price       Decimal      @db.Decimal(10, 2)
+  available   Boolean      @default(true)
+  createdAt   DateTime     @default(now()) @map("created_at")
+
+  category    Category     @relation(fields: [categoryId], references: [id])
+  options     MenuOption[]
+  orderItems  OrderItem[]
+
+  @@map("menu_items")
+}
+
+model MenuOption {
+  id         Int            @id @default(autoincrement())
+  menuItemId Int            @map("menu_item_id")
+  optionName String         @map("option_name") @db.VarChar(100)
+  optionType OptionTypeEnum @map("option_type")
+  extraPrice Decimal        @default(0) @map("extra_price") @db.Decimal(10, 2)
+  groupName  String?        @map("group_name") @db.VarChar(100)
+
+  menuItem   MenuItem       @relation(fields: [menuItemId], references: [id], onDelete: Cascade)
+
+  @@map("menu_options")
+}
+
+model Order {
+  id          Int             @id @default(autoincrement())
+  tableId     Int             @map("table_id")
+  orderNumber String          @unique @map("order_number") @db.VarChar(50)
+  totalPrice  Decimal         @map("total_price") @db.Decimal(10, 2)
+  status      OrderStatusEnum @default(pending)
+  createdAt   DateTime        @default(now()) @map("created_at")
+  updatedAt   DateTime        @updatedAt @map("updated_at")
+
+  table       Table           @relation(fields: [tableId], references: [id])
+  items       OrderItem[]
+  payments    Payment[]
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id         Int      @id @default(autoincrement())
+  orderId    Int      @map("order_id")
+  menuItemId Int      @map("menu_item_id")
+  quantity   Int
+  note       String?  @db.Text
+  price      Decimal  @db.Decimal(10, 2)
+
+  order      Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  menuItem   MenuItem @relation(fields: [menuItemId], references: [id])
+
+  @@map("order_items")
+}
+
+model Payment {
+  id            Int               @id @default(autoincrement())
+  orderId       Int               @map("order_id")
+  method        PaymentMethodEnum
+  amount        Decimal           @db.Decimal(10, 2)
+  paymentStatus PaymentStatusEnum @default(pending) @map("payment_status")
+  qrPayload     String?           @map("qr_payload") @db.Text
+  qrImageUrl    String?           @map("qr_image_url") @db.Text
+  paidAt        DateTime?         @map("paid_at")
+  createdAt     DateTime          @default(now()) @map("created_at")
+
+  order         Order             @relation(fields: [orderId], references: [id])
+
+  @@map("payments")
+}

@@ -1,57 +1,73 @@
-version: '3.8'
+version: "3.9"
 
 services:
-  db:
-    image: postgres:15-alpine
-    container_name: bizflow-db
-    restart: always
+  mysql-db:
+    image: mysql:8.0
+    container_name: bizflow-mysql
+    restart: unless-stopped
     environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
+      MYSQL_ROOT_PASSWORD: rootpass123
+      MYSQL_DATABASE: bizflow_db
+      MYSQL_USER: bizflow
+      MYSQL_PASSWORD: bizflow123
     ports:
-      - "5432:5432"
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
     networks:
-      - bizflow-network
+      - bizflow-net
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-prootpass123"]
+      interval: 10s
+      retries: 10
+      start_period: 30s
 
-  api-gateway:
-    build: ./services/api-gateway
+  api-server:
+    build:
+      context: ./apps/api-server
+      dockerfile: Dockerfile
+    container_name: bizflow-api
+    restart: unless-stopped
+    depends_on:
+      mysql-db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: "mysql://bizflow:bizflow123@mysql-db:3306/bizflow_db"
+      PORT: 5000
+      NODE_ENV: development
+      JWT_SECRET: "docker-dev-secret-change-me"
+      CORS_ORIGIN: "http://localhost:3000,http://localhost:3001"
+      PROMPTPAY_ID: "0812345678"
     ports:
       - "5000:5000"
-    depends_on:
-      - db
+    volumes:
+      - ./apps/api-server/src:/app/src
+      - ./apps/api-server/prisma:/app/prisma
     networks:
-      - bizflow-network
-
-  admin-app:
-    build: ./apps/admin-app
-    ports:
-      - "3001:3000"
-    networks:
-      - bizflow-network
-
-  staff-app:
-    build: ./apps/staff-app
-    ports:
-      - "3002:3000"
-    networks:
-      - bizflow-network
+      - bizflow-net
+    command: sh -c "npx prisma migrate deploy && npx prisma db seed && npm run dev"
 
   customer-app:
-    build: ./apps/customer-app
+    build:
+      context: ./apps/customer-app
+      dockerfile: Dockerfile
+    container_name: bizflow-web
+    restart: unless-stopped
+    depends_on:
+      - api-server
+    environment:
+      VITE_API_URL: "http://localhost:5000/api"
     ports:
-      - "3003:3000"
+      - "3000:3000"
+    volumes:
+      - ./apps/customer-app/src:/app/src
+      - ./apps/customer-app/public:/app/public
     networks:
-      - bizflow-network
+      - bizflow-net
 
-  dev-portal:
-    build: ./apps/dev-portal
-    container_name: bizflow-dev-portal
-    ports:
-      - "3004:3000"
-    networks:
-      - bizflow-network
+volumes:
+  mysql_data:
 
 networks:
-  bizflow-network:
+  bizflow-net:
     driver: bridge
