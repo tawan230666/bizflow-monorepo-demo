@@ -1,6 +1,56 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+
+// 🌐 พจนานุกรม
+const dict: Record<string, any> = {
+  th: {
+    pageTitle: "💰 Finance & Accounting",
+    pageDesc: "ดูงบการเงิน พร้อมภาพรวม Cash Flow และโครงสร้างต้นทุน",
+    totalRevenue: "รายได้รวม",
+    cogs: "ต้นทุนขาย (COGS)",
+    grossProfit: "กำไรขั้นต้น",
+    netProfit: "กำไรสุทธิ",
+    incomeSource: "📊 ที่มาของรายได้",
+    category: "หมวดหมู่",
+    salesAmt: "ยอดขาย (฿)",
+    expenses: "💸 ต้นทุนและค่าใช้จ่าย",
+    expenseItem: "รายการค่าใช้จ่าย",
+    amount: "จำนวน (฿)",
+    topItems: "🔥 เมนูขายดีที่สุด",
+    menu: "เมนู",
+    qty: "จำนวน",
+    revenue: "รายได้ (฿)"
+  },
+  en: {
+    pageTitle: "💰 Finance & Accounting",
+    pageDesc: "View financial statements, cash flow, and cost structure",
+    totalRevenue: "Total Revenue",
+    cogs: "COGS",
+    grossProfit: "Gross Profit",
+    netProfit: "Net Profit",
+    incomeSource: "📊 Income Sources",
+    category: "Category",
+    salesAmt: "Sales (฿)",
+    expenses: "💸 Costs & Expenses",
+    expenseItem: "Expense Item",
+    amount: "Amount (฿)",
+    topItems: "🔥 Top Selling Items",
+    menu: "Menu",
+    qty: "Qty",
+    revenue: "Revenue (฿)"
+  }
+};
 
 export default function FinancePage() {
+  // 🌐 ระบบแปลภาษา
+  const [language, setLanguage] = useState(localStorage.getItem('bizflow_language') || 'th');
+  const t = dict[language];
+
+  useEffect(() => {
+    const handleLangUpdate = () => setLanguage(localStorage.getItem('bizflow_language') || 'th');
+    window.addEventListener('language_updated', handleLangUpdate);
+    return () => window.removeEventListener('language_updated', handleLangUpdate);
+  }, []);
+
   const [financeData] = useState({
     revenue: 150000,
     costOfGoods: 45000,
@@ -9,23 +59,23 @@ export default function FinancePage() {
   });
 
   const [incomeSources] = useState([
-    { id: 1, category: 'อาหารจานหลัก', amount: 80000 },
-    { id: 2, category: 'เครื่องดื่ม', amount: 45000 },
-    { id: 3, category: 'ของหวาน / ของทานเล่น', amount: 25000 },
+    { id: 1, category: language === 'th' ? 'อาหารจานหลัก' : 'Main Dish', amount: 80000 },
+    { id: 2, category: language === 'th' ? 'เครื่องดื่ม' : 'Beverages', amount: 45000 },
+    { id: 3, category: language === 'th' ? 'ของหวาน / ของทานเล่น' : 'Desserts / Snacks', amount: 25000 },
   ]);
 
   const [expenseBreakdown] = useState([
-    { id: 1, category: 'ค่าแรงพนักงาน', amount: 18000 },
-    { id: 2, category: 'ค่าวัตถุดิบ', amount: 24000 },
-    { id: 3, category: 'ค่าเช่าสถานที่', amount: 12000 },
-    { id: 4, category: 'ค่าไฟ/น้ำ', amount: 6000 },
+    { id: 1, category: language === 'th' ? 'ค่าแรงพนักงาน' : 'Payroll', amount: 18000 },
+    { id: 2, category: language === 'th' ? 'ค่าวัตถุดิบ' : 'Ingredients', amount: 24000 },
+    { id: 3, category: language === 'th' ? 'ค่าเช่าสถานที่' : 'Rent', amount: 12000 },
+    { id: 4, category: language === 'th' ? 'ค่าไฟ/น้ำ' : 'Utilities', amount: 6000 },
   ]);
 
   const [topItems] = useState([
-    { id: 101, name: 'ชาเย็น', qty: 410, revenue: 16400 },
-    { id: 102, name: 'ผัดไทยกุ้งสด', qty: 320, revenue: 25600 },
-    { id: 103, name: 'กะเพราหมูกรอบ', qty: 285, revenue: 17100 },
-    { id: 104, name: 'ชาเฉาก๊วย', qty: 230, revenue: 13800 },
+    { id: 101, name: language === 'th' ? 'ชาเย็น' : 'Thai Tea', qty: 410, revenue: 16400 },
+    { id: 102, name: language === 'th' ? 'ผัดไทยกุ้งสด' : 'Pad Thai', qty: 320, revenue: 25600 },
+    { id: 103, name: language === 'th' ? 'กะเพราหมูกรอบ' : 'Crispy Pork Basil', qty: 285, revenue: 17100 },
+    { id: 104, name: language === 'th' ? 'ชาเฉาก๊วย' : 'Grass Jelly Tea', qty: 230, revenue: 13800 },
   ]);
 
   const grossProfit = financeData.revenue - financeData.costOfGoods;
@@ -34,32 +84,28 @@ export default function FinancePage() {
 
   return (
     <div className="page-container">
-      {/* 🟢 แก้ไขตรงนี้: เพิ่ม </div> ปิดแท็กที่หายไปให้ครบ */}
       <div className="page-header">
         <div>
-          <h2>💰 Finance & Accounting</h2>
-          <p style={{ margin: '8px 0 0', color: 'var(--text-muted)' }}>ดูงบการเงิน พร้อมภาพรวม Cash Flow และโครงสร้างต้นทุน</p>
+          <h2>{t.pageTitle}</h2>
+          <p style={{ margin: '8px 0 0', color: 'var(--text-muted)' }}>{t.pageDesc}</p>
         </div>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px', marginBottom: '32px' }}>
         <div className="card">
-          <div className="kpi-title">รายได้รวม</div>
+          <div className="kpi-title">{t.totalRevenue}</div>
           <div className="kpi-value mono">฿{financeData.revenue.toLocaleString()}</div>
         </div>
-
         <div className="card">
-          <div className="kpi-title">ต้นทุนขาย (COGS)</div>
+          <div className="kpi-title">{t.cogs}</div>
           <div className="kpi-value mono" style={{ color: 'var(--loss)' }}>฿{financeData.costOfGoods.toLocaleString()}</div>
         </div>
-
         <div className="card">
-          <div className="kpi-title">กำไรขั้นต้น</div>
+          <div className="kpi-title">{t.grossProfit}</div>
           <div className="kpi-value mono" style={{ color: 'var(--profit)' }}>฿{grossProfit.toLocaleString()}</div>
         </div>
-
         <div className="card" style={{ border: `1px solid ${isProfit ? 'var(--profit)' : 'var(--loss)'}40`, background: isProfit ? 'var(--profit-bg)' : 'var(--loss-bg)' }}>
-          <div className="kpi-title" style={{ color: isProfit ? 'var(--profit)' : 'var(--loss)' }}>กำไรสุทธิ</div>
+          <div className="kpi-title" style={{ color: isProfit ? 'var(--profit)' : 'var(--loss)' }}>{t.netProfit}</div>
           <div className="kpi-value mono" style={{ color: isProfit ? 'var(--profit)' : 'var(--loss)' }}>
             {isProfit ? '+' : ''}฿{netProfit.toLocaleString()}
           </div>
@@ -69,13 +115,13 @@ export default function FinancePage() {
       <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '24px', marginBottom: '32px' }}>
         <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
           <div style={{ padding: '20px 24px', borderBottom: '1px solid var(--border-light)', background: 'var(--bg-body)' }}>
-            <h3 style={{ margin: 0, fontSize: '15px', color: 'var(--text-main)' }}>📊 ที่มาของรายได้</h3>
+            <h3 style={{ margin: 0, fontSize: '15px', color: 'var(--text-main)' }}>{t.incomeSource}</h3>
           </div>
           <table className="modern-table">
             <thead>
               <tr>
-                <th>หมวดหมู่</th>
-                <th style={{ textAlign: 'right' }}>ยอดขาย (฿)</th>
+                <th>{t.category}</th>
+                <th style={{ textAlign: 'right' }}>{t.salesAmt}</th>
               </tr>
             </thead>
             <tbody>
@@ -91,13 +137,13 @@ export default function FinancePage() {
 
         <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
           <div style={{ padding: '20px 24px', borderBottom: '1px solid var(--border-light)', background: 'var(--bg-body)' }}>
-            <h3 style={{ margin: 0, fontSize: '15px', color: 'var(--text-main)' }}>💸 ต้นทุนและค่าใช้จ่าย</h3>
+            <h3 style={{ margin: 0, fontSize: '15px', color: 'var(--text-main)' }}>{t.expenses}</h3>
           </div>
           <table className="modern-table">
             <thead>
               <tr>
-                <th>รายการค่าใช้จ่าย</th>
-                <th style={{ textAlign: 'right' }}>จำนวน (฿)</th>
+                <th>{t.expenseItem}</th>
+                <th style={{ textAlign: 'right' }}>{t.amount}</th>
               </tr>
             </thead>
             <tbody>
@@ -115,14 +161,14 @@ export default function FinancePage() {
       <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '24px' }}>
         <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
           <div style={{ padding: '20px 24px', borderBottom: '1px solid var(--border-light)', background: 'var(--bg-body)' }}>
-            <h3 style={{ margin: 0, fontSize: '15px', color: 'var(--text-main)' }}>🔥 เมนูขายดีที่สุด</h3>
+            <h3 style={{ margin: 0, fontSize: '15px', color: 'var(--text-main)' }}>{t.topItems}</h3>
           </div>
           <table className="modern-table">
             <thead>
               <tr>
-                <th>เมนู</th>
-                <th style={{ textAlign: 'center' }}>จำนวน</th>
-                <th style={{ textAlign: 'right' }}>รายได้ (฿)</th>
+                <th>{t.menu}</th>
+                <th style={{ textAlign: 'center' }}>{t.qty}</th>
+                <th style={{ textAlign: 'right' }}>{t.revenue}</th>
               </tr>
             </thead>
             <tbody>
