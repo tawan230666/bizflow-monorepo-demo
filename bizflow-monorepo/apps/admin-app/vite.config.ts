@@ -5,8 +5,8 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   server: {
-    port: 3001,
-    strictPort: true,
-    host: '0.0.0.0'
+    port: 3001,       // 👈 แก้เป็น 3000 ตามตัวหลังใน docker-compose
+    strictPort: true, 
+    host: '0.0.0.0'   
   }
 })
