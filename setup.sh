@@ -59,8 +59,8 @@ services:
     networks:
       - bizflow-network
 
-  admin-app:
-    build: ./apps/admin-app
+  admin-production-grade:
+    build: ./apps/admin-production-grade
     ports:
       - "3001:3000"
     networks:
@@ -118,12 +118,12 @@ cd ../..
 
 # 5. สร้าง Frontend
 cd apps
-npm create vite@latest admin-app -- --template react-ts
+npm create vite@latest admin-production-grade -- --template react-ts
 npm create vite@latest staff-app -- --template react-ts
 npm create vite@latest customer-app -- --template react-ts
 npm create vite@latest dev-portal -- --template react-ts
 
-for app in admin-app staff-app customer-app dev-portal; do
+for app in admin-production-grade staff-app customer-app dev-portal; do
 cat << 'EOF' > $app/Dockerfile
 FROM node:20-alpine
 WORKDIR /app

@@ -8,10 +8,17 @@ export const TableEntry = () => {
   const setTableId = useTableStore((s) => s.setTableId);
 
   useEffect(() => {
+    // แปลงค่าจาก URL ให้เป็นตัวเลข
     const id = Number(tableId);
-    if (!isNaN(id)) {
+
+    // ตรวจสอบว่า id เป็นตัวเลขที่ถูกต้องหรือไม่
+    if (!isNaN(id) && id > 0) {
       setTableId(id);
       navigate(`/table/${id}/menu`, { replace: true });
+    } else {
+      // หากไม่ใช่ตัวเลข หรือไม่มีค่า ให้พากลับไปที่หน้าแรก
+      console.warn("Invalid Table ID");
+      navigate("/", { replace: true });
     }
   }, [tableId, setTableId, navigate]);
 

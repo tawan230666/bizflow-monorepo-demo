@@ -8,7 +8,7 @@ importers:
 
   .: {}
 
-  apps/admin-app:
+  apps/admin-production-grade:
     dependencies:
       react:
         specifier: ^19.2.5
