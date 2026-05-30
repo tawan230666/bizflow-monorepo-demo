@@ -7,25 +7,24 @@ export const BottomNav = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { tableId } = useParams();
-  const cartCount = useCartStore((s) => s.getCount());
-  const history = useOrderStore((s) => s.history);
-
   const currentTableId = Number(tableId);
+  const cartItems = useCartStore((s) => s.cartsByTable[currentTableId]) ?? [];
+  const cartCount = cartItems.reduce((sum, i) => sum + i.quantity, 0);
+  const history = useOrderStore((s) => s.history);
 
   // ✅ Count เฉพาะ active orders ของโต๊ะนี้
   const activeCount = useMemo(
     () =>
-      history.filter(
-        (h) => h.tableId === currentTableId && h.status !== "paid"
-      ).length,
-    [history, currentTableId]
+      history.filter((h) => h.tableId === currentTableId && h.status !== "paid")
+        .length,
+    [history, currentTableId],
   );
 
   const isActive = (path: string) => location.pathname.includes(path);
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-stone-200 px-4 py-2 z-40">
-      <div className="flex justify-around max-w-md mx-auto">
+      <div className="flex justify-around max-w-md md:max-w-xl mx-auto">
         <button
           onClick={() => navigate(`/table/${tableId}/menu`)}
           className={`flex flex-col items-center py-2 px-4 ${

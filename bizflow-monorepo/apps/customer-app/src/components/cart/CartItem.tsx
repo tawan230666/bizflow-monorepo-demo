@@ -1,3 +1,4 @@
+import { useParams } from "react-router-dom";
 import type { CartItem as CartItemType } from "@/types/cart";
 import { formatPrice } from "@/utils/formatPrice";
 import { useCartStore } from "@/store/cartStore";
@@ -7,6 +8,8 @@ interface Props {
 }
 
 export const CartItem = ({ item }: Props) => {
+  const { tableId } = useParams();
+  const currentTableId = Number(tableId);
   const updateQuantity = useCartStore((s) => s.updateQuantity);
   const removeItem = useCartStore((s) => s.removeItem);
 
@@ -43,14 +46,26 @@ export const CartItem = ({ item }: Props) => {
           </p>
           <div className="flex items-center gap-2">
             <button
-              onClick={() => updateQuantity(item.cartItemId, item.quantity - 1)}
+              onClick={() =>
+                updateQuantity(
+                  currentTableId,
+                  item.cartItemId,
+                  item.quantity - 1,
+                )
+              }
               className="w-7 h-7 rounded-full bg-stone-100 hover:bg-stone-200"
             >
               −
             </button>
             <span className="w-6 text-center text-sm">{item.quantity}</span>
             <button
-              onClick={() => updateQuantity(item.cartItemId, item.quantity + 1)}
+              onClick={() =>
+                updateQuantity(
+                  currentTableId,
+                  item.cartItemId,
+                  item.quantity + 1,
+                )
+              }
               className="w-7 h-7 rounded-full bg-amber-600 text-white hover:bg-amber-700"
             >
               +
@@ -59,7 +74,7 @@ export const CartItem = ({ item }: Props) => {
         </div>
       </div>
       <button
-        onClick={() => removeItem(item.cartItemId)}
+        onClick={() => removeItem(currentTableId, item.cartItemId)}
         className="text-stone-400 hover:text-red-500 text-sm self-start"
         aria-label="ลบ"
       >

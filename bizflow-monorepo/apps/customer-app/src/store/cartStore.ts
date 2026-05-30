@@ -7,38 +7,68 @@ import { STORAGE_KEYS } from "@/utils/constants";
 export const useCartStore = create<CartState>()(
   persist(
     (set, get) => ({
-      items: [],
+      cartsByTable: {},
 
-      addItem: (item) =>
+      addItem: (tableId, item) =>
+        set((state) => {
+          const current = state.cartsByTable[tableId] ?? [];
+          return {
+            cartsByTable: {
+              ...state.cartsByTable,
+              [tableId]: [...current, { ...item, cartItemId: generateId() }],
+            },
+          };
+        }),
+
+      removeItem: (tableId, cartItemId) =>
+        set((state) => {
+          const current = state.cartsByTable[tableId] ?? [];
+          return {
+            cartsByTable: {
+              ...state.cartsByTable,
+              [tableId]: current.filter((i) => i.cartItemId !== cartItemId),
+            },
+          };
+        }),
+
+      updateQuantity: (tableId, cartItemId, qty) =>
+        set((state) => {
+          const current = state.cartsByTable[tableId] ?? [];
+          return {
+            cartsByTable: {
+              ...state.cartsByTable,
+              [tableId]: current
+                .map((i) =>
+                  i.cartItemId === cartItemId ? { ...i, quantity: qty } : i
+                )
+                .filter((i) => i.quantity > 0),
+            },
+          };
+        }),
+
+      updateNote: (tableId, cartItemId, note) =>
+        set((state) => {
+          const current = state.cartsByTable[tableId] ?? [];
+          return {
+            cartsByTable: {
+              ...state.cartsByTable,
+              [tableId]: current.map((i) =>
+                i.cartItemId === cartItemId ? { ...i, note } : i
+              ),
+            },
+          };
+        }),
+
+      clear: (tableId) =>
         set((state) => ({
-          items: [...state.items, { ...item, cartItemId: generateId() }],
+          cartsByTable: { ...state.cartsByTable, [tableId]: [] },
         })),
 
-      removeItem: (cartItemId) =>
-        set((state) => ({
-          items: state.items.filter((i) => i.cartItemId !== cartItemId),
-        })),
+      getItems: (tableId) => get().cartsByTable[tableId] ?? [],
 
-      updateQuantity: (cartItemId, qty) =>
-        set((state) => ({
-          items: state.items
-            .map((i) =>
-              i.cartItemId === cartItemId ? { ...i, quantity: qty } : i
-            )
-            .filter((i) => i.quantity > 0),
-        })),
-
-      updateNote: (cartItemId, note) =>
-        set((state) => ({
-          items: state.items.map((i) =>
-            i.cartItemId === cartItemId ? { ...i, note } : i
-          ),
-        })),
-
-      clear: () => set({ items: [] }),
-
-      getTotal: () => {
-        return get().items.reduce((sum, item) => {
+      getTotal: (tableId) => {
+        const items = get().cartsByTable[tableId] ?? [];
+        return items.reduce((sum, item) => {
           const optionsPrice = item.selectedOptions.reduce(
             (s, o) => s + o.extraPrice,
             0
@@ -47,8 +77,10 @@ export const useCartStore = create<CartState>()(
         }, 0);
       },
 
-      getCount: () =>
-        get().items.reduce((sum, item) => sum + item.quantity, 0),
+      getCount: (tableId) => {
+        const items = get().cartsByTable[tableId] ?? [];
+        return items.reduce((sum, item) => sum + item.quantity, 0);
+      },
     }),
     { name: STORAGE_KEYS.CART }
   )

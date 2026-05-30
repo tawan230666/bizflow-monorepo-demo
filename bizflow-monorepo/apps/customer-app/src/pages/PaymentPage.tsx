@@ -8,31 +8,44 @@ import { PaymentQR } from "@/components/order/PaymentQR";
 import { Button } from "@/components/common/Button";
 import { toast } from "@/components/common/Toast";
 import { formatPrice } from "@/utils/formatPrice";
-import type { Payment } from "@/types/order";
+import type { Order, Payment } from "@/types/order";
 
 export const PaymentPage = () => {
   const { tableId, orderId } = useParams();
   const navigate = useNavigate();
-  const order = useOrderStore((s) => s.currentOrder);
-  const setOrder = useOrderStore((s) => s.setOrder);
+  const orderIdNum = Number(orderId);
+
+  // ✅ ใช้ local state ผูกกับ order ของหน้านี้โดยเฉพาะ (ไม่ปนกับ currentOrder ใน global store)
+  const [order, setOrderState] = useState<Order | null>(null);
+  const syncStore = useOrderStore((s) => s.setOrder);
   const [payment, setPayment] = useState<Payment | null>(null);
   const [loading, setLoading] = useState(true);
 
   // 🔒 Guard: ไม่ให้สร้าง QR ซ้ำ (ใช้ ref เพื่อข้าม React StrictMode double-call)
   const qrCreated = useRef(false);
 
-  // 🔔 Listen for "payment:received" via socket
-  useOrderSocket(Number(orderId));
+  // set order ทั้ง local + sync เข้า store (ให้หน้าอื่นเห็น history ล่าสุด)
+  const applyOrder = (o: Order) => {
+    setOrderState(o);
+    syncStore(o);
+  };
+
+  // 🔔 Listen for status/payment ผ่าน socket → re-fetch order ฉบับเต็ม
+  useOrderSocket(orderIdNum, {
+    onPaid: () => orderApi.getOrderById(orderIdNum).then(applyOrder),
+    onStatus: () => orderApi.getOrderById(orderIdNum).then(applyOrder),
+  });
 
   const isPaid = order?.status === "paid";
 
-  // Load order if not in store
+  // โหลด order ครั้งแรกของหน้านี้
   useEffect(() => {
-    if (!order || order.id !== Number(orderId)) {
-      orderApi.getOrderById(Number(orderId)).then(setOrder);
-    }
+    orderApi
+      .getOrderById(orderIdNum)
+      .then(applyOrder)
+      .catch(() => toast.error("ไม่พบออเดอร์นี้"));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [orderId]);
+  }, [orderIdNum]);
 
   // Create QR — ครั้งเดียวเท่านั้น!
   useEffect(() => {
@@ -41,14 +54,14 @@ export const PaymentPage = () => {
     qrCreated.current = true;
 
     paymentApi
-      .createPromptPay({ orderId: Number(orderId), amount: order.totalPrice })
+      .createPromptPay({ orderId: orderIdNum, amount: order.totalPrice })
       .then(setPayment)
       .catch((err: Error) => {
         toast.error(err.message);
         qrCreated.current = false; // ถ้า error → ลองใหม่ได้
       })
       .finally(() => setLoading(false));
-  }, [order, orderId, isPaid]);
+  }, [order, orderIdNum, isPaid]);
 
   if (!order) {
     return (
@@ -65,11 +78,13 @@ export const PaymentPage = () => {
   return (
     <div className="min-h-screen bg-stone-50 pb-28">
       <header className="bg-white px-4 py-3 flex items-center gap-3 border-b border-stone-200 sticky top-0 z-30">
-        <button onClick={() => navigate(-1)}>←</button>
-        <h1 className="font-semibold">ชำระเงิน</h1>
+        <div className="max-w-xl mx-auto w-full flex items-center gap-3">
+          <button onClick={() => navigate(-1)}>←</button>
+          <h1 className="font-semibold">ชำระเงิน</h1>
+        </div>
       </header>
 
-      <main className="p-4 space-y-4">
+      <main className="p-4 space-y-4 max-w-xl mx-auto">
         {loading ? (
           <div className="bg-white rounded-2xl p-12 text-center">
             <div className="animate-spin w-8 h-8 border-2 border-stone-200 border-t-amber-600 rounded-full mx-auto mb-3" />
@@ -97,14 +112,16 @@ export const PaymentPage = () => {
         )}
       </main>
 
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-stone-200 p-4 max-w-md mx-auto">
-        <Button
-          fullWidth
-          variant="secondary"
-          onClick={() => navigate(`/table/${tableId}/menu`)}
-        >
-          กลับไปที่เมนู
-        </Button>
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-stone-200 p-4 z-40">
+        <div className="max-w-xl mx-auto">
+          <Button
+            fullWidth
+            variant="secondary"
+            onClick={() => navigate(`/table/${tableId}/menu`)}
+          >
+            กลับไปที่เมนู
+          </Button>
+        </div>
       </div>
     </div>
   );
@@ -112,7 +129,12 @@ export const PaymentPage = () => {
 
 // ============ Success View ============
 interface SuccessProps {
-  order: { id: number; orderNumber: string; totalPrice: number; items: Array<{ id: number; name: string; quantity: number; price: number }> };
+  order: {
+    id: number;
+    orderNumber: string;
+    totalPrice: number;
+    items: Array<{ id: number; name: string; quantity: number; price: number }>;
+  };
   tableId: string;
 }
 
@@ -139,9 +161,7 @@ const PaymentSuccessView = ({ order, tableId }: SuccessProps) => {
             <h1 className="text-3xl font-bold text-stone-900 mt-6">
               ชำระเงินสำเร็จ!
             </h1>
-            <p className="text-stone-600 mt-2">
-              ขอบคุณที่ใช้บริการครับ 🙏
-            </p>
+            <p className="text-stone-600 mt-2">ขอบคุณที่ใช้บริการครับ 🙏</p>
           </div>
 
           <div className="bg-white rounded-2xl shadow-lg p-6 mb-6 animate-fade-in">

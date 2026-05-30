@@ -16,7 +16,7 @@ interface OrderStoreState {
   history: OrderHistoryItem[];
 
   setOrder: (order: Order) => void;
-  updateStatus: (status: OrderStatus) => void;
+  updateStatus: (status: OrderStatus, orderId?: number) => void;
   clearOrder: () => void;
   updateHistoryStatus: (orderId: number, status: OrderStatus) => void;
   removeFromHistory: (orderId: number) => void;
@@ -50,14 +50,21 @@ export const useOrderStore = create<OrderStoreState>()(
         });
       },
 
-      updateStatus: (status) => {
+      updateStatus: (status, orderId) => {
         const current = get().currentOrder;
-        if (!current) return;
+        // ✅ อัปเดต currentOrder ถ้ามี (และ orderId ตรง ถ้าระบุมา)
+        const shouldUpdateCurrent =
+          current && (orderId === undefined || current.id === orderId);
+
         set({
-          currentOrder: { ...current, status },
-          history: get().history.map((h) =>
-            h.orderId === current.id ? { ...h, status } : h
-          ),
+          currentOrder: shouldUpdateCurrent
+            ? { ...current!, status }
+            : current,
+          // ✅ อัปเดต history ด้วยเสมอ แม้ currentOrder จะเป็น null
+          history: get().history.map((h) => {
+            const targetId = orderId ?? current?.id;
+            return h.orderId === targetId ? { ...h, status } : h;
+          }),
         });
       },
 
