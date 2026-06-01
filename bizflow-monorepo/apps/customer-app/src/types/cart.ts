@@ -12,12 +12,14 @@ export interface CartItem {
 }
 
 export interface CartState {
-  items: CartItem[];
-  addItem: (item: Omit<CartItem, "cartItemId">) => void;
-  removeItem: (cartItemId: string) => void;
-  updateQuantity: (cartItemId: string, qty: number) => void;
-  updateNote: (cartItemId: string, note: string) => void;
-  clear: () => void;
-  getTotal: () => number;
-  getCount: () => number;
+  // ✅ แยกตะกร้าตามโต๊ะ: { [tableId]: CartItem[] }
+  cartsByTable: Record<number, CartItem[]>;
+  addItem: (tableId: number, item: Omit<CartItem, "cartItemId">) => void;
+  removeItem: (tableId: number, cartItemId: string) => void;
+  updateQuantity: (tableId: number, cartItemId: string, qty: number) => void;
+  updateNote: (tableId: number, cartItemId: string, note: string) => void;
+  clear: (tableId: number) => void;
+  getItems: (tableId: number) => CartItem[];
+  getTotal: (tableId: number) => number;
+  getCount: (tableId: number) => number;
 }

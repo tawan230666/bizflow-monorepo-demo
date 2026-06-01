@@ -45,10 +45,7 @@ export const OrderStatus = () => {
           <p className="text-sm text-stone-500 mb-6">
             ออเดอร์นี้อาจเป็นของโต๊ะอื่น หรือถูกลบไปแล้ว
           </p>
-          <Button
-            fullWidth
-            onClick={() => navigate(`/table/${tableId}/menu`)}
-          >
+          <Button fullWidth onClick={() => navigate(`/table/${tableId}/menu`)}>
             กลับไปเมนูโต๊ะ {tableId}
           </Button>
         </div>
@@ -66,20 +63,22 @@ export const OrderStatus = () => {
 
   return (
     <div className="min-h-screen bg-stone-50 pb-32">
-      <header className="bg-white px-4 py-3 border-b border-stone-200 flex items-center gap-3 sticky top-0 z-30">
-        <button
-          onClick={() => navigate(`/table/${tableId}/menu`)}
-          className="w-10 h-10 rounded-full hover:bg-stone-100 flex items-center justify-center text-stone-700"
-        >
-          ←
-        </button>
-        <div className="flex-1">
-          <p className="text-xs text-stone-500">หมายเลขออเดอร์</p>
-          <h1 className="font-bold">{order.orderNumber}</h1>
+      <header className="bg-white px-4 py-3 border-b border-stone-200 sticky top-0 z-30">
+        <div className="max-w-2xl mx-auto flex items-center gap-3">
+          <button
+            onClick={() => navigate(`/table/${tableId}/menu`)}
+            className="w-10 h-10 rounded-full hover:bg-stone-100 flex items-center justify-center text-stone-700"
+          >
+            ←
+          </button>
+          <div className="flex-1">
+            <p className="text-xs text-stone-500">หมายเลขออเดอร์</p>
+            <h1 className="font-bold">{order.orderNumber}</h1>
+          </div>
         </div>
       </header>
 
-      <main className="p-4 space-y-4">
+      <main className="p-4 space-y-4 max-w-2xl mx-auto">
         <OrderTimeline current={order.status} />
 
         <div className="bg-white rounded-2xl p-4 text-center">
@@ -87,7 +86,9 @@ export const OrderStatus = () => {
             <p className="text-stone-700">⏳ ออเดอร์ของคุณกำลังรอเข้าครัว</p>
           )}
           {order.status === "cooking" && (
-            <p className="text-amber-700 font-medium">🔥 ครัวกำลังปรุงอาหารของคุณ</p>
+            <p className="text-amber-700 font-medium">
+              🔥 ครัวกำลังปรุงอาหารของคุณ
+            </p>
           )}
           {order.status === "served" && (
             <p className="text-green-700 font-medium">
@@ -95,7 +96,9 @@ export const OrderStatus = () => {
             </p>
           )}
           {order.status === "paid" && (
-            <p className="text-blue-700 font-medium">💰 ขอบคุณที่ใช้บริการครับ</p>
+            <p className="text-blue-700 font-medium">
+              💰 ขอบคุณที่ใช้บริการครับ
+            </p>
           )}
         </div>
 
@@ -107,14 +110,18 @@ export const OrderStatus = () => {
                 key={it.id}
                 className="flex justify-between text-sm border-b border-stone-100 pb-2 last:border-0"
               >
-                <span>{it.name} × {it.quantity}</span>
+                <span>
+                  {it.name} × {it.quantity}
+                </span>
                 <span>{formatPrice(it.price * it.quantity)}</span>
               </div>
             ))}
           </div>
           <div className="flex justify-between mt-3 pt-3 border-t border-stone-200 font-semibold">
             <span>รวมทั้งสิ้น</span>
-            <span className="text-amber-600">{formatPrice(order.totalPrice)}</span>
+            <span className="text-amber-600">
+              {formatPrice(order.totalPrice)}
+            </span>
           </div>
         </div>
 
@@ -129,13 +136,15 @@ export const OrderStatus = () => {
       </main>
 
       {order.status === "served" && (
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-stone-200 p-4 max-w-md mx-auto">
-          <Button
-            fullWidth
-            onClick={() => navigate(`/table/${tableId}/payment/${order.id}`)}
-          >
-            ชำระเงิน · {formatPrice(order.totalPrice)}
-          </Button>
+        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-stone-200 p-4 z-40">
+          <div className="max-w-2xl mx-auto">
+            <Button
+              fullWidth
+              onClick={() => navigate(`/table/${tableId}/payment/${order.id}`)}
+            >
+              ชำระเงิน · {formatPrice(order.totalPrice)}
+            </Button>
+          </div>
         </div>
       )}
     </div>

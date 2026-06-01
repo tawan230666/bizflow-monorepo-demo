@@ -19,7 +19,7 @@ const AppShell = () => {
       className={
         isAdmin
           ? "min-h-screen bg-stone-50"
-          : "max-w-md mx-auto bg-stone-50 min-h-screen"
+          : "w-full max-w-screen-2xl mx-auto bg-stone-50 min-h-screen"
       }
     >
       <Routes>
@@ -31,8 +31,14 @@ const AppShell = () => {
         <Route path="/table/:tableId/menu/:itemId" element={<MenuDetail />} />
         <Route path="/table/:tableId/cart" element={<CartPage />} />
         <Route path="/table/:tableId/orders" element={<OrderHistoryPage />} />
-        <Route path="/table/:tableId/order/:orderId" element={<OrderStatus />} />
-        <Route path="/table/:tableId/payment/:orderId" element={<PaymentPage />} />
+        <Route
+          path="/table/:tableId/order/:orderId"
+          element={<OrderStatus />}
+        />
+        <Route
+          path="/table/:tableId/payment/:orderId"
+          element={<PaymentPage />}
+        />
       </Routes>
       <ToastContainer />
     </div>

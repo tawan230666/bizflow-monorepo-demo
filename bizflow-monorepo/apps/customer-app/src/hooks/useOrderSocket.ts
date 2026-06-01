@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { io, Socket } from "socket.io-client";
 import { useOrderStore } from "@/store/orderStore";
 import type { OrderStatus } from "@/types/order";
@@ -8,8 +8,20 @@ const SOCKET_URL =
 
 let socket: Socket | null = null;
 
-export const useOrderSocket = (orderId: number | null) => {
+interface SocketHandlers {
+  onStatus?: (status: OrderStatus) => void;
+  onPaid?: () => void;
+}
+
+export const useOrderSocket = (
+  orderId: number | null,
+  handlers?: SocketHandlers
+) => {
   const updateStatus = useOrderStore((s) => s.updateStatus);
+
+  // ✅ เก็บ handlers ใน ref เพื่อไม่ให้ effect re-run ทุกครั้งที่ parent re-render
+  const handlersRef = useRef(handlers);
+  handlersRef.current = handlers;
 
   useEffect(() => {
     if (!orderId) return;
@@ -30,14 +42,16 @@ export const useOrderSocket = (orderId: number | null) => {
       status: OrderStatus;
     }) => {
       if (data.orderId === orderId) {
-        updateStatus(data.status);
+        updateStatus(data.status, orderId);
+        handlersRef.current?.onStatus?.(data.status);
         console.log(`[Socket] Order ${orderId} status: ${data.status}`);
       }
     };
 
     const handlePaymentReceived = (data: { orderId: number }) => {
       if (data.orderId === orderId) {
-        updateStatus("paid");
+        updateStatus("paid", orderId);
+        handlersRef.current?.onPaid?.();
         console.log(`[Socket] Payment received for order ${orderId}`);
       }
     };

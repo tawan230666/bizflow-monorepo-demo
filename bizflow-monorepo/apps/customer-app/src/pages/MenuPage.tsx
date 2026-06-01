@@ -29,8 +29,8 @@ export const MenuPage = () => {
 
   return (
     <div className="min-h-screen pb-32">
-      <header className="sticky top-0 bg-stone-50/95 backdrop-blur z-30 px-4 pt-4 pb-3">
-        <h1 className="text-xl font-bold text-stone-900 mb-3">
+      <header className="sticky top-0 bg-stone-50/95 backdrop-blur z-30 px-4 md:px-6 lg:px-8 pt-4 pb-3">
+        <h1 className="text-xl md:text-2xl font-bold text-stone-900 mb-3">
           เมนูอาหาร · โต๊ะ {tableId}
         </h1>
 
@@ -49,31 +49,25 @@ export const MenuPage = () => {
         </div>
       </header>
 
-      <main className="px-4 mt-2">
-        {error && (
-          <p className="text-center text-red-500 py-8">⚠️ {error}</p>
-        )}
+      <main className="px-4 md:px-6 lg:px-8 mt-2">
+        {error && <p className="text-center text-red-500 py-8">⚠️ {error}</p>}
 
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4">
           {loading
-            ? Array.from({ length: 4 }).map((_, i) => (
+            ? Array.from({ length: 10 }).map((_, i) => (
                 <FoodCardSkeleton key={i} />
               ))
             : filtered.map((item) => (
                 <FoodCard
                   key={item.id}
                   item={item}
-                  onClick={() =>
-                    navigate(`/table/${tableId}/menu/${item.id}`)
-                  }
+                  onClick={() => navigate(`/table/${tableId}/menu/${item.id}`)}
                 />
               ))}
         </div>
 
         {!loading && filtered.length === 0 && (
-          <p className="text-center text-stone-500 py-8">
-            ไม่พบเมนูที่ค้นหา
-          </p>
+          <p className="text-center text-stone-500 py-8">ไม่พบเมนูที่ค้นหา</p>
         )}
       </main>
 

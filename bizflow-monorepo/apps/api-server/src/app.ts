@@ -15,9 +15,7 @@ export const createApp = () => {
         "http://localhost:4000",
         "http://localhost:4001",
       ],
-      credentials: true, // จำเป็นต้องเปิดไว้ถ้าคุณมีการส่ง cookies หรือ authorization headers
-      methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-    }),
+    })
   );
 
   app.use(express.json({ limit: "10mb" }));

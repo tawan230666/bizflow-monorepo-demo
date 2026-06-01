@@ -40,7 +40,7 @@ export const MenuDetail = () => {
   const total = (item.price + optionsPrice) * quantity;
 
   const handleAdd = () => {
-    addItem({
+    addItem(Number(tableId), {
       menuItemId: item.id,
       name: item.name,
       imageUrl: item.imageUrl,
@@ -55,68 +55,84 @@ export const MenuDetail = () => {
 
   return (
     <div className="min-h-screen pb-28 bg-stone-50">
-      <div className="aspect-square bg-stone-100 relative">
-        <img
-          src={item.imageUrl}
-          alt={item.name}
-          className="w-full h-full object-cover"
-        />
-        <button
-          onClick={() => navigate(-1)}
-          className="absolute top-4 left-4 w-10 h-10 bg-white/90 rounded-full flex items-center justify-center"
-        >
-          ←
-        </button>
+      <div className="max-w-5xl mx-auto md:px-6 md:py-6">
+        <div className="md:grid md:grid-cols-2 md:gap-8 md:items-start">
+          {/* รูปอาหาร */}
+          <div className="relative md:sticky md:top-6">
+            <div className="aspect-square md:rounded-2xl overflow-hidden bg-stone-100 md:max-h-[70vh]">
+              <img
+                src={item.imageUrl}
+                alt={item.name}
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <button
+              onClick={() => navigate(-1)}
+              className="absolute top-4 left-4 w-10 h-10 bg-white/90 rounded-full flex items-center justify-center shadow-sm hover:bg-white"
+            >
+              ←
+            </button>
+          </div>
+
+          {/* รายละเอียด + ตัวเลือก */}
+          <div className="px-4 py-5 md:px-0 md:py-0 space-y-5">
+            <div>
+              <h1 className="text-2xl font-bold">{item.name}</h1>
+              <p className="text-stone-600 mt-2">{item.description}</p>
+              <p className="text-amber-600 font-semibold text-xl mt-3">
+                {formatPrice(item.price)}
+              </p>
+            </div>
+
+            {item.options.length > 0 && (
+              <OptionSelector
+                options={item.options}
+                selected={selectedOptions}
+                onChange={setSelectedOptions}
+              />
+            )}
+
+            <div>
+              <h4 className="font-medium mb-2">หมายเหตุ</h4>
+              <textarea
+                value={note}
+                onChange={(e) => setNote(e.target.value)}
+                placeholder="เช่น ไม่ใส่ผัก, เผ็ดน้อย"
+                rows={2}
+                className="w-full p-3 rounded-xl border border-stone-200 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+              />
+            </div>
+
+            <div className="flex items-center justify-center md:justify-start gap-4">
+              <button
+                onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                className="w-10 h-10 rounded-full bg-stone-200 hover:bg-stone-300 transition-colors"
+              >
+                −
+              </button>
+              <span className="text-xl font-semibold w-10 text-center">
+                {quantity}
+              </span>
+              <button
+                onClick={() => setQuantity(quantity + 1)}
+                className="w-10 h-10 rounded-full bg-amber-600 text-white hover:bg-amber-700 transition-colors"
+              >
+                +
+              </button>
+            </div>
+
+            {/* ปุ่มเพิ่มลงตะกร้า — แสดงตรงนี้บน PC (ไม่ลอย) */}
+            <div className="hidden md:block pt-2">
+              <Button fullWidth onClick={handleAdd}>
+                เพิ่มลงตะกร้า · {formatPrice(total)}
+              </Button>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div className="px-4 py-5 space-y-5">
-        <div>
-          <h1 className="text-2xl font-bold">{item.name}</h1>
-          <p className="text-stone-600 mt-2">{item.description}</p>
-          <p className="text-amber-600 font-semibold text-xl mt-3">
-            {formatPrice(item.price)}
-          </p>
-        </div>
-
-        {item.options.length > 0 && (
-          <OptionSelector
-            options={item.options}
-            selected={selectedOptions}
-            onChange={setSelectedOptions}
-          />
-        )}
-
-        <div>
-          <h4 className="font-medium mb-2">หมายเหตุ</h4>
-          <textarea
-            value={note}
-            onChange={(e) => setNote(e.target.value)}
-            placeholder="เช่น ไม่ใส่ผัก, เผ็ดน้อย"
-            rows={2}
-            className="w-full p-3 rounded-xl border border-stone-200 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
-          />
-        </div>
-
-        <div className="flex items-center justify-center gap-4">
-          <button
-            onClick={() => setQuantity(Math.max(1, quantity - 1))}
-            className="w-10 h-10 rounded-full bg-stone-200"
-          >
-            −
-          </button>
-          <span className="text-xl font-semibold w-10 text-center">
-            {quantity}
-          </span>
-          <button
-            onClick={() => setQuantity(quantity + 1)}
-            className="w-10 h-10 rounded-full bg-amber-600 text-white"
-          >
-            +
-          </button>
-        </div>
-      </div>
-
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-stone-200 p-4">
+      {/* ปุ่มลอยด้านล่าง — เฉพาะมือถือ */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-stone-200 p-4 md:hidden">
         <Button fullWidth onClick={handleAdd}>
           เพิ่มลงตะกร้า · {formatPrice(total)}
         </Button>
