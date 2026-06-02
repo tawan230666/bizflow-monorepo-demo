@@ -1,5 +1,4 @@
 import React, { useMemo, useState } from 'react';
-
 type Section = 'menu' | 'staff' | 'inventory';
 type Status = 'active' | 'inactive';
 type DrawerType = Section | null;
@@ -912,6 +911,7 @@ export default function MenuPage() {
               </form>
             )}
           </aside>
+
         </div>
       )}
     </div>
