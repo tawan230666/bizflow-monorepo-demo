@@ -1,14 +1,84 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+// 🌐 พจนานุกรมสำหรับหน้าแดชบอร์ด (Overview)
+const dict: Record<string, any> = {
+  th: {
+    pageTitle: "Command Center",
+    pageSubtitle: "ภาพรวมระดับผู้บริหาร ยอดสาขา ต้นทุน และกลยุทธ์ที่ต้องลงมือวันนี้",
+    bkk: "กรุงเทพฯ (HQ)",
+    cnx: "เชียงใหม่",
+    hkt: "ภูเก็ต",
+    cardSales: "ยอดขายสาขา",
+    cardSalesDesc: "รายได้รวมวันนี้",
+    cardReach: "CUSTOMER REACH",
+    cardReachDesc: "ลูกค้าที่เข้าร้าน",
+    cardOrders: "ORDERS",
+    cardOrdersDesc: "ออเดอร์ที่สั่งสำเร็จ",
+    cardMargin: "NET MARGIN",
+    cardMarginDesc: "กำไรหลังหักต้นทุน",
+    targetTitle: "Q2 / 2026 Target",
+    targetDesc: "เป้าหมายยอดขายรวมทุกสาขาประจำไตรมาสที่ 2",
+    actual: "(Actual)",
+    goal: "(Goal)",
+    runwayTitle: "Cash & Runway",
+    runwayDesc: "Burn Rate",
+    cacLtvTitle: "CAC VS LTV",
+    fraudTitle: "Fraud Prevention",
+    fraudCancel: "Cancel Rate",
+    fraudAbuse: "Discount Abuse",
+    branchTitle: "Multi-Branch Performance",
+    branchDesc: "อันดับสาขา Top 3 และ Bottom",
+    costTitle: "Cost Breakdown",
+  },
+  en: {
+    pageTitle: "Command Center",
+    pageSubtitle: "Executive overview of sales, costs, and actionable strategies today",
+    bkk: "Bangkok (HQ)",
+    cnx: "Chiang Mai",
+    hkt: "Phuket",
+    cardSales: "TOTAL SALES",
+    cardSalesDesc: "Today's Revenue",
+    cardReach: "CUSTOMER REACH",
+    cardReachDesc: "Walk-in & Online",
+    cardOrders: "ORDERS",
+    cardOrdersDesc: "Completed Orders",
+    cardMargin: "NET MARGIN",
+    cardMarginDesc: "Profit after costs",
+    targetTitle: "Q2 / 2026 Target",
+    targetDesc: "Overall multi-branch sales target for Quarter 2",
+    actual: "(Actual)",
+    goal: "(Goal)",
+    runwayTitle: "Cash & Runway",
+    runwayDesc: "Burn Rate",
+    cacLtvTitle: "CAC VS LTV",
+    fraudTitle: "Fraud Prevention",
+    fraudCancel: "Cancel Rate",
+    fraudAbuse: "Discount Abuse",
+    branchTitle: "Multi-Branch Performance",
+    branchDesc: "Top 3 and Bottom Branches",
+    costTitle: "Cost Breakdown",
+  }
+};
+
 export default function OverviewPage() {
   const navigate = useNavigate();
   const [currentTime, setCurrentTime] = useState(new Date());
   const [branch, setBranch] = useState('bkk');
 
+  // 🌐 ดึงภาษามาใช้
+  const [language, setLanguage] = useState(localStorage.getItem('bizflow_language') || 'th');
+  const t = dict[language];
+
+  useEffect(() => {
+    const handleLangUpdate = () => setLanguage(localStorage.getItem('bizflow_language') || 'th');
+    window.addEventListener('language_updated', handleLangUpdate);
+    return () => window.removeEventListener('language_updated', handleLangUpdate);
+  }, []);
+
   const branchData: Record<string, any> = {
     bkk: {
-      name: 'กรุงเทพฯ (HQ)',
+      name: t.bkk,
       sales: 12450,
       orders: 84,
       customers: 142,
@@ -21,7 +91,7 @@ export default function OverviewPage() {
       topMarginItem: 'ชาเฉาก๊วย',
     },
     cnx: {
-      name: 'เชียงใหม่',
+      name: t.cnx,
       sales: 8200,
       orders: 45,
       customers: 89,
@@ -34,7 +104,7 @@ export default function OverviewPage() {
       topMarginItem: 'ชาเฉาก๊วย',
     },
     hkt: {
-      name: 'ภูเก็ต',
+      name: t.hkt,
       sales: 15600,
       orders: 112,
       customers: 210,
@@ -72,41 +142,63 @@ export default function OverviewPage() {
   return (
     <div className="page-container" style={{ maxWidth: '1440px', margin: '0 auto', animation: 'pageEnter 0.5s ease-out forwards', fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif' }}>
       
-      {/* 🚀 CSS พิเศษสำหรับหน้านี้ เพื่อทำ Scroll แนวนอนแบบ Apple & เอฟเฟกต์การ์ด */}
       <style>{`
-        .apple-scroll::-webkit-scrollbar { display: none; }
-        .apple-scroll { -ms-overflow-style: none; scrollbar-width: none; scroll-behavior: smooth; }
         .apple-card { 
           background: var(--bg-card); 
           border: 1px solid var(--border-light); 
-          border-radius: 28px; /* ขอบมนแบบ Apple */
-          padding: 32px; 
-          transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease;
+          border-radius: 24px;
+          padding: 24px 32px; 
+          transition: transform 0.3s ease, box-shadow 0.3s ease;
+          display: flex;
+          flex-direction: column;
         }
         .apple-card:hover { 
-          transform: scale(1.02) translateY(-4px); 
-          box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+          transform: translateY(-4px); 
+          box-shadow: 0 16px 32px rgba(0,0,0,0.15);
+        }
+        
+        .custom-branch-select {
+          padding: 10px 24px; 
+          borderRadius: 999px; 
+          background: transparent; 
+          border: none; 
+          color: var(--text-main); 
+          font-weight: 700; 
+          cursor: pointer; 
+          outline: none; 
+          font-size: 15px;
+          font-family: inherit;
+        }
+        .custom-branch-select option {
+          background-color: #0f172a;
+          color: #f8fafc;
+          font-weight: 600;
+          padding: 12px;
+        }
+        body.light-mode .custom-branch-select option {
+          background-color: #ffffff;
+          color: #0f172a;
         }
       `}</style>
 
-      {/* HEADER SECTION (ปรับให้ดูคลีนขึ้น) */}
+      {/* HEADER SECTION */}
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '48px', textAlign: 'center' }}>
         <h1 style={{ fontSize: '42px', fontWeight: 800, margin: '0 0 12px', letterSpacing: '-0.02em', color: 'var(--text-main)' }}>
-          Command Center
+          {t.pageTitle}
         </h1>
         <p style={{ color: 'var(--text-muted)', fontSize: '18px', margin: '0 0 24px', maxWidth: '600px' }}>
-          ภาพรวมระดับผู้บริหาร ยอดสาขา ต้นทุน และกลยุทธ์ที่ต้องลงมือวันนี้
+          {t.pageSubtitle}
         </p>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', background: 'var(--bg-card)', padding: '8px', borderRadius: '999px', border: '1px solid var(--border-light)', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
           <select
             value={branch}
             onChange={(e) => setBranch(e.target.value)}
-            style={{ padding: '10px 24px', borderRadius: '999px', background: 'transparent', border: 'none', color: 'var(--text-main)', fontWeight: 600, cursor: 'pointer', outline: 'none', fontSize: '15px' }}
+            className="custom-branch-select"
           >
-            <option value="bkk">📍 กรุงเทพฯ (HQ)</option>
-            <option value="cnx">📍 เชียงใหม่</option>
-            <option value="hkt">📍 ภูเก็ต</option>
+            <option value="bkk">📍 {t.bkk}</option>
+            <option value="cnx">📍 {t.cnx}</option>
+            <option value="hkt">📍 {t.hkt}</option>
           </select>
           <div style={{ width: '1px', height: '24px', background: 'var(--border-light)' }}></div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--profit)', padding: '0 16px', fontWeight: 700, fontSize: '14px' }}>
@@ -116,42 +208,66 @@ export default function OverviewPage() {
         </div>
       </div>
 
-      {/* 🚀 NEW: TOP KPI CARDS (Horizontal Scroll แบบเว็บ Apple) */}
-      <div className="apple-scroll" style={{ display: 'flex', gap: '24px', overflowX: 'auto', paddingBottom: '20px', marginBottom: '20px' }}>
-        <div className="apple-card" style={{ minWidth: '280px', flex: '0 0 auto', borderTop: '4px solid #6366f1' }}>
-          <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '12px' }}>ยอดขายสาขา</div>
-          <div className="mono" style={{ fontSize: '38px', fontWeight: 800, letterSpacing: '-1px' }}>฿{currentKPI.sales.toLocaleString()}</div>
-          <p style={{ margin: '8px 0 0', color: 'var(--text-muted)', fontSize: '14px' }}>รายได้รวมวันนี้</p>
+      {/* TOP KPI CARDS */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px', alignItems: 'flex-start', marginBottom: '32px' }}>
+        <div className="apple-card" style={{ borderTop: '4px solid #6366f1' }}>
+          <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '12px' }}>
+            {t.cardSales}
+          </div>
+          <div className="mono" style={{ fontSize: '38px', fontWeight: 800, letterSpacing: '-1px' }}>
+            ฿{currentKPI.sales.toLocaleString()}
+          </div>
+          <p style={{ margin: '8px 0 0', color: 'var(--text-muted)', fontSize: '14px' }}>
+            {t.cardSalesDesc}
+          </p>
         </div>
 
-        <div className="apple-card" style={{ minWidth: '280px', flex: '0 0 auto', borderTop: '4px solid #3b82f6' }}>
-          <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '12px' }}>Customer Reach</div>
-          <div className="mono" style={{ fontSize: '38px', fontWeight: 800, letterSpacing: '-1px' }}>{currentKPI.customerTraffic}</div>
-          <p style={{ margin: '8px 0 0', color: 'var(--text-muted)', fontSize: '14px' }}>ลูกค้าที่เข้าร้าน</p>
+        <div className="apple-card" style={{ borderTop: '4px solid #3b82f6' }}>
+          <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '12px' }}>
+            {t.cardReach}
+          </div>
+          <div className="mono" style={{ fontSize: '38px', fontWeight: 800, letterSpacing: '-1px' }}>
+            {currentKPI.customerTraffic}
+          </div>
+          <p style={{ margin: '8px 0 0', color: 'var(--text-muted)', fontSize: '14px' }}>
+            {t.cardReachDesc}
+          </p>
         </div>
 
-        <div className="apple-card" style={{ minWidth: '280px', flex: '0 0 auto', borderTop: '4px solid #eab308' }}>
-          <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '12px' }}>Orders</div>
-          <div className="mono" style={{ fontSize: '38px', fontWeight: 800, letterSpacing: '-1px' }}>{currentKPI.orders}</div>
-          <p style={{ margin: '8px 0 0', color: 'var(--text-muted)', fontSize: '14px' }}>ออเดอร์ที่สั่งสำเร็จ</p>
+        <div className="apple-card" style={{ borderTop: '4px solid #eab308' }}>
+          <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '12px' }}>
+            {t.cardOrders}
+          </div>
+          <div className="mono" style={{ fontSize: '38px', fontWeight: 800, letterSpacing: '-1px' }}>
+            {currentKPI.orders}
+          </div>
+          <p style={{ margin: '8px 0 0', color: 'var(--text-muted)', fontSize: '14px' }}>
+            {t.cardOrdersDesc}
+          </p>
         </div>
 
-        <div className="apple-card" style={{ minWidth: '280px', flex: '0 0 auto', borderTop: '4px solid #22c55e', background: 'linear-gradient(145deg, var(--bg-card), rgba(34, 197, 94, 0.05))' }}>
-          <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--profit)', textTransform: 'uppercase', marginBottom: '12px' }}>Net Margin</div>
-          <div className="mono" style={{ fontSize: '38px', fontWeight: 800, color: 'var(--profit)', letterSpacing: '-1px' }}>฿{currentKPI.profit.toLocaleString()}</div>
-          <p style={{ margin: '8px 0 0', color: 'var(--text-muted)', fontSize: '14px' }}>กำไรหลังหักต้นทุน</p>
+        <div className="apple-card" style={{ borderTop: '4px solid #22c55e', background: 'linear-gradient(145deg, var(--bg-card), rgba(34, 197, 94, 0.05))' }}>
+          <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--profit)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '12px' }}>
+            {t.cardMargin}
+          </div>
+          <div className="mono" style={{ fontSize: '38px', fontWeight: 800, color: 'var(--profit)', letterSpacing: '-1px' }}>
+            ฿{currentKPI.profit.toLocaleString()}
+          </div>
+          <p style={{ margin: '8px 0 0', color: 'var(--text-muted)', fontSize: '14px' }}>
+            {t.cardMarginDesc}
+          </p>
         </div>
       </div>
 
-      {/* COMPANY GOALS (สไตล์ Apple คลีนๆ) */}
+      {/* COMPANY GOALS */}
       <div className="apple-card" style={{ marginBottom: '40px', padding: '40px', background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, var(--bg-card) 100%)', border: '1px solid rgba(99, 102, 241, 0.2)' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '32px', flexWrap: 'wrap', gap: '16px' }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
               <span style={{ fontSize: '28px' }}>🎯</span>
-              <h3 style={{ margin: 0, fontSize: '22px', fontWeight: 800, color: 'var(--text-main)' }}>Q2 / 2026 Target</h3>
+              <h3 style={{ margin: 0, fontSize: '22px', fontWeight: 800, color: 'var(--text-main)' }}>{t.targetTitle}</h3>
             </div>
-            <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: '15px' }}>เป้าหมายยอดขายรวมทุกสาขาประจำไตรมาสที่ 2</p>
+            <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: '15px' }}>{t.targetDesc}</p>
           </div>
           <div style={{ textAlign: 'right' }}>
             <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px' }}>Progress</div>
@@ -159,14 +275,13 @@ export default function OverviewPage() {
           </div>
         </div>
 
-        {/* Progress Bar (หนาขึ้น มนขึ้น แบบ Apple UI) */}
         <div style={{ width: '100%', height: '24px', background: 'rgba(255,255,255,0.05)', borderRadius: '999px', overflow: 'hidden', boxShadow: 'inset 0 2px 8px rgba(0,0,0,0.2)' }}>
           <div style={{ width: '85%', height: '100%', background: 'linear-gradient(90deg, #6366f1, #a855f7)', borderRadius: '999px', transition: 'width 1.5s cubic-bezier(0.16, 1, 0.3, 1)' }}></div>
         </div>
 
         <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '16px', fontSize: '15px', fontWeight: 600 }}>
-          <span className="mono" style={{ color: 'var(--text-main)' }}>฿8,500,000 (Actual)</span>
-          <span className="mono" style={{ color: 'var(--text-muted)' }}>฿10,000,000 (Goal)</span>
+          <span className="mono" style={{ color: 'var(--text-main)' }}>฿8,500,000 {t.actual}</span>
+          <span className="mono" style={{ color: 'var(--text-muted)' }}>฿10,000,000 {t.goal}</span>
         </div>
       </div>
 
@@ -174,11 +289,11 @@ export default function OverviewPage() {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px', marginBottom: '40px' }}>
         <div className="apple-card">
           <div style={{ fontSize: '13px', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '20px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ fontSize: '18px' }}>💸</span> Cash & Runway
+            <span style={{ fontSize: '18px' }}>💸</span> {t.runwayTitle}
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
             <div>
-              <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Burn Rate</div>
+              <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>{t.runwayDesc}</div>
               <div className="mono" style={{ fontSize: '24px', fontWeight: 800, color: 'var(--loss)', marginTop: '4px' }}>฿250k</div>
             </div>
             <div style={{ textAlign: 'right' }}>
@@ -190,7 +305,7 @@ export default function OverviewPage() {
 
         <div className="apple-card">
           <div style={{ fontSize: '13px', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '20px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ fontSize: '18px' }}>🧲</span> CAC vs LTV
+            <span style={{ fontSize: '18px' }}>🧲</span> {t.cacLtvTitle}
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
             <div>
@@ -206,25 +321,26 @@ export default function OverviewPage() {
 
         <div className="apple-card" style={{ border: '1px solid rgba(239, 68, 68, 0.2)', background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.05) 0%, var(--bg-card) 100%)' }}>
           <div style={{ fontSize: '13px', color: 'var(--loss)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '20px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ fontSize: '18px' }}>🚨</span> Fraud Prevention
+            <span style={{ fontSize: '18px' }}>🚨</span> {t.fraudTitle}
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
             <div>
-              <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Cancel Rate</div>
+              <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>{t.fraudCancel}</div>
               <div className="mono" style={{ fontSize: '24px', fontWeight: 800, color: 'var(--text-main)', marginTop: '4px' }}>1.2%</div>
             </div>
             <div style={{ textAlign: 'right' }}>
-              <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Discount Abuse</div>
+              <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>{t.fraudAbuse}</div>
               <div className="mono" style={{ fontSize: '28px', fontWeight: 800, color: 'var(--text-main)', marginTop: '4px' }}>0.5%</div>
             </div>
           </div>
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 0.6fr', gap: '24px', marginBottom: '40px' }}>
-        <div className="apple-card" style={{ padding: '40px' }}>
-          <h3 style={{ margin: '0 0 8px', fontSize: '20px', fontWeight: 800 }}>📊 Multi-Branch Performance</h3>
-          <p style={{ color: 'var(--text-muted)', fontSize: '15px', marginBottom: '32px' }}>อันดับสาขา Top 3 และ Bottom</p>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '24px', marginBottom: '40px' }}>
+        
+        <div className="apple-card" style={{ padding: '40px', minWidth: 0 }}>
+          <h3 style={{ margin: '0 0 8px', fontSize: '20px', fontWeight: 800 }}>📊 {t.branchTitle}</h3>
+          <p style={{ color: 'var(--text-muted)', fontSize: '15px', marginBottom: '32px' }}>{t.branchDesc}</p>
           
           <div style={{ display: 'grid', gap: '16px' }}>
             {branchPerformance.map((branchSummary, index) => (
@@ -241,9 +357,9 @@ export default function OverviewPage() {
           </div>
         </div>
 
-        <div style={{ display: 'grid', gap: '24px' }}>
+        <div style={{ display: 'grid', minWidth: 0 }}>
           <div className="apple-card" style={{ padding: '32px' }}>
-            <h3 style={{ margin: '0 0 24px', fontSize: '18px', fontWeight: 800 }}>🍩 Cost Breakdown</h3>
+            <h3 style={{ margin: '0 0 24px', fontSize: '18px', fontWeight: 800 }}>🍩 {t.costTitle}</h3>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '32px' }}>
               <div style={{ width: '160px', height: '160px', borderRadius: '50%', background: `conic-gradient(var(--loss) 0 ${(cogsPercent / 100) * 360}deg, var(--warning) ${(cogsPercent / 100) * 360}deg ${((cogsPercent + laborPercent) / 100) * 360}deg, var(--profit) ${((cogsPercent + laborPercent) / 100) * 360}deg 360deg)`, display: 'grid', placeItems: 'center' }}>
                 <div style={{ width: '100px', height: '100px', borderRadius: '50%', background: 'var(--bg-card)', display: 'grid', placeItems: 'center' }}>
