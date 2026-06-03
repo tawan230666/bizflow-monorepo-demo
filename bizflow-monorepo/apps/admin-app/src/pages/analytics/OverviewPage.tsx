@@ -6,6 +6,19 @@ export default function OverviewPage() {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [branch, setBranch] = useState('bkk');
 
+<<<<<<< Updated upstream
+=======
+  // 🌐 ดึงภาษามาใช้
+  const [language, setLanguage] = useState(localStorage.getItem('bizflow_language') || 'th');
+  const t = dict[language];
+
+  useEffect(() => {
+    const handleLangUpdate = () => setLanguage(localStorage.getItem('bizflow_language') || 'th');
+    window.addEventListener('language_updated', handleLangUpdate);
+    return () => window.removeEventListener('language_updated', handleLangUpdate);
+  }, []);
+
+>>>>>>> Stashed changes
   const branchData: Record<string, any> = {
     bkk: {
       name: 'กรุงเทพฯ (HQ)',
@@ -84,8 +97,37 @@ export default function OverviewPage() {
           transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease;
         }
         .apple-card:hover { 
+<<<<<<< Updated upstream
           transform: scale(1.02) translateY(-4px); 
           box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+=======
+          transform: translateY(-4px); 
+          box-shadow: 0 16px 32px rgba(0,0,0,0.15);
+        }
+        
+        /* สไตล์ Dropdown (Select) แบบ Dark Mode คมชัด */
+        .custom-branch-select {
+          padding: 10px 24px; 
+          borderRadius: 999px; 
+          background: transparent; 
+          border: none; 
+          color: var(--text-main); 
+          font-weight: 700; 
+          cursor: pointer; 
+          outline: none; 
+          font-size: 15px;
+          font-family: inherit;
+        }
+        .custom-branch-select option {
+          background-color: #0f172a;
+          color: #f8fafc;
+          font-weight: 600;
+          padding: 12px;
+        }
+        body.light-mode .custom-branch-select option {
+          background-color: #ffffff;
+          color: #0f172a;
+>>>>>>> Stashed changes
         }
       `}</style>
 
@@ -116,6 +158,7 @@ export default function OverviewPage() {
         </div>
       </div>
 
+<<<<<<< Updated upstream
       {/* 🚀 NEW: TOP KPI CARDS (Horizontal Scroll แบบเว็บ Apple) */}
       <div className="apple-scroll" style={{ display: 'flex', gap: '24px', overflowX: 'auto', paddingBottom: '20px', marginBottom: '20px' }}>
         <div className="apple-card" style={{ minWidth: '280px', flex: '0 0 auto', borderTop: '4px solid #6366f1' }}>
@@ -140,6 +183,61 @@ export default function OverviewPage() {
           <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--profit)', textTransform: 'uppercase', marginBottom: '12px' }}>Net Margin</div>
           <div className="mono" style={{ fontSize: '38px', fontWeight: 800, color: 'var(--profit)', letterSpacing: '-1px' }}>฿{currentKPI.profit.toLocaleString()}</div>
           <p style={{ margin: '8px 0 0', color: 'var(--text-muted)', fontSize: '14px' }}>กำไรหลังหักต้นทุน</p>
+=======
+      {/* 🚀 TOP KPI CARDS - ลบระบบกดเปิด/ปิดออก โชว์ข้อมูลตรงๆ */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px', alignItems: 'flex-start', marginBottom: '32px' }}>
+        
+        {/* กล่องยอดขาย */}
+        <div className="apple-card" style={{ borderTop: '4px solid #6366f1' }}>
+          <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '12px' }}>
+            {t.cardSales}
+          </div>
+          <div className="mono" style={{ fontSize: '38px', fontWeight: 800, letterSpacing: '-1px' }}>
+            ฿{currentKPI.sales.toLocaleString()}
+          </div>
+          <p style={{ margin: '8px 0 0', color: 'var(--text-muted)', fontSize: '14px' }}>
+            {t.cardSalesDesc}
+          </p>
+        </div>
+
+        {/* กล่อง Reach */}
+        <div className="apple-card" style={{ borderTop: '4px solid #3b82f6' }}>
+          <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '12px' }}>
+            {t.cardReach}
+          </div>
+          <div className="mono" style={{ fontSize: '38px', fontWeight: 800, letterSpacing: '-1px' }}>
+            {currentKPI.customerTraffic}
+          </div>
+          <p style={{ margin: '8px 0 0', color: 'var(--text-muted)', fontSize: '14px' }}>
+            {t.cardReachDesc}
+          </p>
+        </div>
+
+        {/* กล่อง Orders */}
+        <div className="apple-card" style={{ borderTop: '4px solid #eab308' }}>
+          <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '12px' }}>
+            {t.cardOrders}
+          </div>
+          <div className="mono" style={{ fontSize: '38px', fontWeight: 800, letterSpacing: '-1px' }}>
+            {currentKPI.orders}
+          </div>
+          <p style={{ margin: '8px 0 0', color: 'var(--text-muted)', fontSize: '14px' }}>
+            {t.cardOrdersDesc}
+          </p>
+        </div>
+
+        {/* กล่อง Margin */}
+        <div className="apple-card" style={{ borderTop: '4px solid #22c55e', background: 'linear-gradient(145deg, var(--bg-card), rgba(34, 197, 94, 0.05))' }}>
+          <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--profit)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '12px' }}>
+            {t.cardMargin}
+          </div>
+          <div className="mono" style={{ fontSize: '38px', fontWeight: 800, color: 'var(--profit)', letterSpacing: '-1px' }}>
+            ฿{currentKPI.profit.toLocaleString()}
+          </div>
+          <p style={{ margin: '8px 0 0', color: 'var(--text-muted)', fontSize: '14px' }}>
+            {t.cardMarginDesc}
+          </p>
+>>>>>>> Stashed changes
         </div>
       </div>
 
