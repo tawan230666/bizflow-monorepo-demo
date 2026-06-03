@@ -242,8 +242,7 @@ function DashboardLayout({ isDarkMode, setIsDarkMode }: any) {
       <div className="main-wrapper">
         <header className="topbar">
           <div className="search-box">
-            <span>🔍</span>
-            <input type="text" placeholder="Search..." style={{ background: 'transparent', border: 'none', outline: 'none', color: 'var(--text-main)' }} />
+            
           </div>
           
           <div className="topbar-actions">
