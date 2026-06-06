@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-// 🚀 นำเข้าเครื่องมือจาก Google Library ที่เพิ่งติดตั้ง
 import { GoogleOAuthProvider, useGoogleLogin } from '@react-oauth/google';
 
 const dict: Record<string, any> = {
@@ -22,8 +21,13 @@ const dict: Record<string, any> = {
     dontHave: "ยังไม่มีบัญชีใช่ไหม? ",
     manageTitle: "จัดการทุกอย่างในที่เดียว",
     manageDesc: "ยกระดับการบริหารธุรกิจของคุณด้วยแพลตฟอร์มที่ครบจบในตัวเดียว",
-    acceptTerms: "ฉันยอมรับข้อกำหนดการใช้งาน และนโยบายการเก็บรักษาข้อมูลส่วนบุคคล (PDPA)",
-    termsError: "กรุณากดตกลงและยินยอมตามข้อกำหนดก่อนสมัครสมาชิก"
+    
+    // 🔒 ข้อความสำหรับ Modal PDPA แบบใหม่
+    termsConsentTitle: "ข้อตกลงและความยินยอม",
+    termsConsentSub: "การเก็บ รวบรวม และใช้ข้อมูลส่วนบุคคล",
+    iAccept: "ฉันยอมรับ ข้อกำหนดและเงื่อนไขการให้บริการ",
+    acceptBtn: "ยอมรับและสมัครสมาชิก",
+    cancelBtn: "ยกเลิก",
   },
   en: {
     welcome: "Welcome back",
@@ -43,31 +47,28 @@ const dict: Record<string, any> = {
     dontHave: "Don't have an account? ",
     manageTitle: "Manage everything in one place",
     manageDesc: "Streamline your business operations with our all-in-one platform.",
-    acceptTerms: "I accept the Terms of Service and Data Privacy Policy (PDPA)",
-    termsError: "Please accept the terms and privacy policy before signing up."
+    
+    // 🔒 ข้อความสำหรับ Modal PDPA แบบใหม่
+    termsConsentTitle: "Terms & Consent",
+    termsConsentSub: "Data Collection and Usage Policy",
+    iAccept: "I accept the Terms and Conditions of Service",
+    acceptBtn: "Accept & Register",
+    cancelBtn: "Cancel",
   }
 };
 
-// 🔑 ก้อนปุ่ม Google แยกออกมาด้านนอกเพื่อให้สามารถใช้ Hook ของไลบรารีได้
 function GoogleLoginButton() {
   const navigate = useNavigate();
-
-  // ⚡ ฟังก์ชันเรียกเปิดหน้าต่างล็อกอินของ Google ของจริง
   const loginWithGoogle = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
       try {
-        // เมื่อล็อกอินผ่าน Google สำเร็จ จะได้ Access Token มา -> นำไปส่งดึงโปรไฟล์จริงต่อทันที
         const res = await fetch('https://www.googleapis.com/oauth2/0.3/userinfo', {
           headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
         });
         const googleUser = await res.json();
-
-        // 🎯 ได้ข้อมูลจริงมาแล้ว! (อีเมล, ชื่อ, รูปโปรไฟล์) เอามาเซฟเข้าระบบเว็บเรา
         localStorage.setItem('bizflow_session', googleUser.email);
         localStorage.setItem('bizflow_profile_name', googleUser.name);
-        localStorage.setItem('bizflow_profile_image', googleUser.picture); // เก็บรูปโปรไฟล์ของ Google ไว้ใช้ได้ด้วย
-
-        // พาวิ่งเข้าหน้าแดชบอร์ด
+        localStorage.setItem('bizflow_profile_image', googleUser.picture);
         navigate('/overview');
       } catch (error) {
         console.error('ดึงข้อมูลโปรไฟล์จาก Google ล้มเหลว:', error);
@@ -79,7 +80,7 @@ function GoogleLoginButton() {
   return (
     <button 
       type="button" 
-      onClick={() => loginWithGoogle()} // สั่งทำงานเมื่อคลิกปุ่ม G
+      onClick={() => loginWithGoogle()}
       style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '12px', borderRadius: '14px', border: '1px solid rgba(255, 255, 255, 0.1)', background: 'rgba(255, 255, 255, 0.03)', cursor: 'pointer', transition: '0.2s', width: '100%' }} 
       onMouseOver={(e) => e.currentTarget.style.background='rgba(255, 255, 255, 0.08)'} 
       onMouseOut={(e) => e.currentTarget.style.background='rgba(255, 255, 255, 0.03)'}
@@ -94,7 +95,7 @@ export default function LoginPage() {
   const [language, setLanguage] = useState(localStorage.getItem('bizflow_language') || 'th');
   const t = dict[language];
 
-  // 🔴 🔴 🔴 สำคัญมาก: ใส่กุญแจ Client ID ของคุณที่ได้จาก Google Cloud Console ที่นี่ 🔴 🔴 🔴
+  // 🔑 ใส่ Client ID ของคุณ
   const GOOGLE_CLIENT_ID = "YOUR_GOOGLE_CLIENT_ID_HERE.apps.googleusercontent.com";
 
   useEffect(() => {
@@ -108,27 +109,42 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [phone, setPhone] = useState('');
+  
+  // 🚀 State สำหรับเปิด/ปิด หน้าต่างเงื่อนไข
+  const [showTermsModal, setShowTermsModal] = useState(false);
   const [agreeTerms, setAgreeTerms] = useState(false);
 
-  const handleRegister = (e: React.FormEvent) => {
+  // 🟢 สเตปที่ 1: พอกดปุ่ม Sign up ในฟอร์ม ให้เช็กว่าฟอร์มครบไหม ถ้าครบให้เปิดหน้าต่าง Modal
+  const handleInitialSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!agreeTerms) { alert(t.termsError); return; }
+    if (isRegistering) {
+      setShowTermsModal(true); // เปิดหน้าต่างอ่านกฎ
+    } else {
+      // ถ้าเป็นโหมด Login ปกติ ก็เข้าสู่ระบบไปเลย
+      processLogin();
+    }
+  };
+
+  // 🟢 สเตปที่ 2: กดปุ่ม "ยอมรับ" ใน Modal เพื่อยืนยันการสมัคร
+  const processRegistration = () => {
     const existingUsers = JSON.parse(localStorage.getItem('bizflow_users') || '[]');
     if (existingUsers.some((user: any) => user.email === email)) {
       alert(language === 'th' ? 'อีเมลนี้ถูกใช้งานแล้ว กรุณาใช้อีเมลอื่น' : 'Email already in use.');
+      setShowTermsModal(false);
       return;
     }
     const newUser = { id: `USR-${Date.now()}`, fullName, phone, email, password, role: 'Admin', createdAt: new Date().toISOString() };
     existingUsers.push(newUser);
     localStorage.setItem('bizflow_users', JSON.stringify(existingUsers));
+    
     alert(language === 'th' ? 'สมัครสมาชิกสำเร็จ! กรุณาเข้าสู่ระบบ' : 'Registration successful! Please log in.');
+    setShowTermsModal(false);
     setIsRegistering(false); 
     setPassword('');
     setAgreeTerms(false);
   };
 
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
+  const processLogin = () => {
     const currentAdminEmail = localStorage.getItem('bizflow_profile_email') || 'admin@bizflow.com';
     const currentAdminPassword = localStorage.getItem('bizflow_profile_password') || '12345678';
     const existingUsers = JSON.parse(localStorage.getItem('bizflow_users') || '[]');
@@ -156,7 +172,6 @@ export default function LoginPage() {
   };
 
   return (
-    // 🔒 ครอบระบบหน้าล็อกอินทั้งหมดด้วย GoogleOAuthProvider สำหรับการยืนยันตัวตนสิทธิ์เข้าถึงของแอป
     <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
       <div className="login-wrapper">
         <div className="login-left">
@@ -171,7 +186,7 @@ export default function LoginPage() {
             <h1 className="login-title">{isRegistering ? t.createAcc : t.welcome}</h1>
             <p className="login-subtitle">{isRegistering ? t.enterPersonal : t.enterDetails}</p>
 
-            <form onSubmit={isRegistering ? handleRegister : handleLogin}>
+            <form onSubmit={handleInitialSubmit}>
               {isRegistering && (
                 <>
                   <div className="input-group">
@@ -193,21 +208,17 @@ export default function LoginPage() {
                 <input type="password" className="input-field" placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} required />
               </div>
 
-              {isRegistering ? (
-                <div className="login-options" style={{ marginBottom: '24px', marginTop: '8px' }}>
-                  <label className="checkbox-label" style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', cursor: 'pointer' }}>
-                    <input type="checkbox" checked={agreeTerms} onChange={(e) => setAgreeTerms(e.target.checked)} style={{ marginTop: '4px', width: '16px', height: '16px', accentColor: 'var(--accent)' }} required /> 
-                    <span style={{ fontSize: '13px', color: 'var(--text-muted)', lineHeight: '1.5' }}>{t.acceptTerms}</span>
-                  </label>
-                </div>
-              ) : (
+              {!isRegistering && (
                 <div className="login-options">
                   <label className="checkbox-label"><input type="checkbox" /> {t.remember}</label>
                   <a href="#" className="forgot-link">{t.forgot}</a>
                 </div>
               )}
 
-              <button type="submit" className="btn-login">{isRegistering ? t.signUp : t.signIn}</button>
+              {/* 🚀 พอกดปุ่มนี้ในโหมด Sign Up มันจะไปเรียก Modal ให้เปิดขึ้นมา */}
+              <button type="submit" className="btn-login" style={{ marginTop: isRegistering ? '24px' : '0' }}>
+                {isRegistering ? t.signUp : t.signIn}
+              </button>
             </form>
 
             <div style={{ display: 'flex', alignItems: 'center', margin: '24px 0', gap: '16px' }}>
@@ -216,18 +227,15 @@ export default function LoginPage() {
               <div style={{ flex: 1, height: '1px', background: 'rgba(255, 255, 255, 0.1)' }}></div>
             </div>
 
-            {/* แถบปุ่มล็อกอินโซเชียลมีเดีย */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px' }}>
-              {/* 🟢 เรียกใช้ปุ่ม Google OAuth ตัวจริงที่แยกฟังก์ชันไว้ด้านบน */}
               <GoogleLoginButton />
-              
               <button type="button" onClick={() => handleSocialLogin('LINE')} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '12px', borderRadius: '14px', border: '1px solid rgba(6, 199, 85, 0.2)', background: 'rgba(6, 199, 85, 0.08)', color: '#06C755', cursor: 'pointer', transition: '0.2s', fontSize: '18px' }} onMouseOver={(e) => e.currentTarget.style.background='rgba(6, 199, 85, 0.15)'} onMouseOut={(e) => e.currentTarget.style.background='rgba(6, 199, 85, 0.08)'}>💬</button>
               <button type="button" onClick={() => handleSocialLogin('Apple')} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '12px', borderRadius: '14px', border: '1px solid rgba(255, 255, 255, 0.1)', background: 'rgba(255, 255, 255, 0.05)', color: '#fff', cursor: 'pointer', transition: '0.2s', fontSize: '20px' }} onMouseOver={(e) => e.currentTarget.style.background='rgba(255, 255, 255, 0.15)'} onMouseOut={(e) => e.currentTarget.style.background='rgba(255, 255, 255, 0.05)'}></button>
             </div>
 
             <p style={{ textAlign: 'center', marginTop: '32px', fontSize: '13px', color: 'var(--text-muted)' }}>
               {isRegistering ? t.alreadyHave : t.dontHave}
-              <button type="button" onClick={() => { setIsRegistering(!isRegistering); setPassword(''); setAgreeTerms(false); }} style={{ background: 'none', border: 'none', color: 'var(--text-main)', fontWeight: 700, cursor: 'pointer', padding: 0, fontFamily: 'inherit' }}>
+              <button type="button" onClick={() => { setIsRegistering(!isRegistering); setPassword(''); setAgreeTerms(false); setShowTermsModal(false); }} style={{ background: 'none', border: 'none', color: 'var(--text-main)', fontWeight: 700, cursor: 'pointer', padding: 0, fontFamily: 'inherit' }}>
                 {isRegistering ? t.signIn : t.signUp}
               </button>
             </p>
@@ -254,6 +262,87 @@ export default function LoginPage() {
           </div>
         </div>
       </div>
+
+      {/* 🚀 MODAL: หน้าต่างอ่านข้อกำหนดและกดยอมรับแบบเดียวกับแอป BKK Waste Pay */}
+      {showTermsModal && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', zIndex: 9999, display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '20px', backdropFilter: 'blur(8px)', animation: 'fadeIn 0.2s ease-out' }}>
+          <div style={{ background: 'var(--bg-surface)', width: '100%', maxWidth: '500px', maxHeight: '85vh', borderRadius: '24px', display: 'flex', flexDirection: 'column', overflow: 'hidden', border: '1px solid var(--border-light)', boxShadow: '0 32px 64px rgba(0,0,0,0.4)', animation: 'slideUp 0.3s ease-out' }}>
+            
+            {/* หัว Modal */}
+            <div style={{ padding: '24px', borderBottom: '1px solid var(--border-light)', textAlign: 'center', background: 'var(--bg-card)' }}>
+              <h2 style={{ margin: '0 0 4px 0', fontSize: '18px', fontWeight: 700, color: 'var(--text-main)' }}>{t.termsConsentTitle}</h2>
+              <p style={{ margin: 0, fontSize: '14px', color: 'var(--text-muted)' }}>{t.termsConsentSub}</p>
+            </div>
+
+            {/* เนื้อหาข้อตกลง (เลื่อนอ่านได้) */}
+            <div style={{ padding: '24px', overflowY: 'auto', flex: 1, color: 'var(--text-muted)', fontSize: '14px', lineHeight: '1.7', background: 'var(--bg-body)' }}>
+              {language === 'th' ? (
+                <>
+                  <p>แอปพลิเคชัน BizFlow คือแพลตฟอร์มสำหรับบริหารจัดการธุรกิจ ผู้ใช้งานสามารถลงชื่อเข้าใช้งานระบบ โดย "ผู้ให้บริการ" จะต้องทำการเก็บรวบรวมข้อมูลส่วนบุคคลของท่าน ได้แก่ ชื่อ-นามสกุล, เบอร์โทรศัพท์, และอีเมล เพื่อวัตถุประสงค์ในการระบุตัวตนและรักษาความปลอดภัยของบัญชีผู้ใช้งาน</p>
+                  <p><strong>1. การรักษาความลับ</strong><br/>ข้อมูลของท่านจะถูกเก็บรักษาไว้เป็นความลับขั้นสูงสุดตามพระราชบัญญัติคุ้มครองข้อมูลส่วนบุคคล พ.ศ. 2562 (PDPA)</p>
+                  <p><strong>2. การใช้งานข้อมูล</strong><br/>เราจะใช้ข้อมูลของท่านเพื่อการให้บริการ แจ้งเตือนสถานะ และปรับปรุงประสบการณ์การใช้งานเท่านั้น จะไม่มีการนำไปขายหรือส่งต่อให้บุคคลที่สามโดยเด็ดขาด</p>
+                  <p><strong>3. การขอลบข้อมูล</strong><br/>ท่านสามารถขอลบบัญชีและข้อมูลส่วนตัวออกจากระบบได้ตลอดเวลาผ่านเมนู "การตั้งค่า (Settings)" ภายในแอปพลิเคชัน</p>
+                </>
+              ) : (
+                <>
+                  <p>BizFlow is a business management platform. To use the system, the "Service Provider" must collect your personal data, including your Full Name, Phone Number, and Email Address, for the purposes of identity verification and account security.</p>
+                  <p><strong>1. Confidentiality</strong><br/>Your data will be kept strictly confidential in compliance with the Personal Data Protection Act (PDPA).</p>
+                  <p><strong>2. Data Usage</strong><br/>We will only use your data to provide services, send status alerts, and improve your user experience. Your data will never be sold or shared with third parties.</p>
+                  <p><strong>3. Data Deletion</strong><br/>You may request the deletion of your account and personal data at any time via the "Settings" menu within the application.</p>
+                </>
+              )}
+            </div>
+
+            {/* ส่วนล่าง: ติ๊กถูก + ปุ่มกดยอมรับ */}
+            <div style={{ padding: '24px', borderTop: '1px solid var(--border-light)', background: 'var(--bg-card)', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', background: 'var(--bg-body)', padding: '16px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                <input 
+                  type="checkbox" 
+                  checked={agreeTerms} 
+                  onChange={(e) => setAgreeTerms(e.target.checked)}
+                  style={{ width: '22px', height: '22px', accentColor: '#22c55e', cursor: 'pointer' }} 
+                /> 
+                <span style={{ fontSize: '14px', color: 'var(--text-main)', fontWeight: 600 }}>
+                  {t.iAccept}
+                </span>
+              </label>
+
+              <div style={{ display: 'flex', gap: '12px' }}>
+                <button 
+                  type="button"
+                  onClick={() => { setShowTermsModal(false); setAgreeTerms(false); }} 
+                  style={{ flex: 1, padding: '14px', background: 'transparent', color: 'var(--text-muted)', border: '1px solid var(--border-light)', borderRadius: '12px', fontWeight: 600, cursor: 'pointer', transition: '0.2s', fontSize: '15px' }}
+                  onMouseOver={(e) => e.currentTarget.style.background = 'var(--bg-body)'}
+                  onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}
+                >
+                  {t.cancelBtn}
+                </button>
+                <button 
+                  type="button"
+                  onClick={processRegistration}
+                  disabled={!agreeTerms}
+                  style={{ 
+                    flex: 2, 
+                    padding: '14px', 
+                    background: agreeTerms ? '#22c55e' : 'var(--bg-body)', 
+                    color: agreeTerms ? '#fff' : 'var(--text-muted)', 
+                    border: 'none', 
+                    borderRadius: '12px', 
+                    fontWeight: 700, 
+                    cursor: agreeTerms ? 'pointer' : 'not-allowed', 
+                    transition: 'all 0.3s ease', 
+                    fontSize: '15px',
+                    boxShadow: agreeTerms ? '0 8px 16px -4px rgba(34, 197, 94, 0.4)' : 'none'
+                  }}
+                >
+                  {t.acceptBtn}
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      )}
     </GoogleOAuthProvider>
   );
 }
