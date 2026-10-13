@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 
-const branches = {
+type BranchId = 'bkk' | 'cnx' | 'hkt';
+
+const branches: Record<BranchId, { name: string; sales: number; orders: number; customers: number; profit: number; churn: number }> = {
   bkk: { name: 'กรุงเทพฯ (HQ)', sales: 12450, orders: 84, customers: 142, profit: 4100, churn: 3.2 },
   cnx: { name: 'เชียงใหม่', sales: 8200, orders: 45, customers: 89, profit: 2500, churn: 4.5 },
   hkt: { name: 'ภูเก็ต', sales: 15600, orders: 112, customers: 210, profit: 5800, churn: 2.1 },
@@ -19,10 +21,11 @@ const customerRecords = [
 export default function BranchReportPage() {
   const { branchId } = useParams<{ branchId?: string }>();
   const navigate = useNavigate();
-  const [selectedBranch, setSelectedBranch] = useState(branchId || 'bkk');
+  const isBranchId = (id?: string): id is BranchId => !!id && id in branches;
+  const [selectedBranch, setSelectedBranch] = useState<BranchId>(isBranchId(branchId) ? branchId : 'bkk');
 
   useEffect(() => {
-    if (branchId && branches[branchId]) {
+    if (isBranchId(branchId)) {
       setSelectedBranch(branchId);
     }
   }, [branchId]);
@@ -60,7 +63,7 @@ export default function BranchReportPage() {
                 </div>
                 <select
                   value={selectedBranch}
-                  onChange={(event) => setSelectedBranch(event.target.value)}
+                  onChange={(event) => setSelectedBranch(event.target.value as BranchId)}
                   style={{
                     width: '100%',
                     marginTop: '12px',

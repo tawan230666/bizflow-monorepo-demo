@@ -1,4 +1,6 @@
 import type { Request, Response, NextFunction } from "express";
+import { env } from "@/config/env";
+import { HttpError } from "@/utils/httpError";
 import { logger } from "@/utils/logger";
 
 export const errorHandler = (
@@ -8,10 +10,18 @@ export const errorHandler = (
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   _next: NextFunction
 ) => {
-  logger.error(`${err.name}: ${err.message}`, err.stack);
+  // Expected, client-caused errors: return the message as-is.
+  if (err instanceof HttpError) {
+    return res.status(err.status).json({ message: err.message });
+  }
 
+  // Unexpected errors: log the details, but never leak internals in production.
+  logger.error(`${err.name}: ${err.message}`, err.stack);
   res.status(500).json({
-    message: err.message || "Internal server error",
+    message:
+      env.NODE_ENV === "production"
+        ? "Internal server error"
+        : err.message || "Internal server error",
   });
 };
 

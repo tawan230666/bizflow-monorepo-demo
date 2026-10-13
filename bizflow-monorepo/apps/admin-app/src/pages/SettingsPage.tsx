@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 
 // 🌐 พจนานุกรมสำหรับหน้า Settings
 const dict: Record<string, any> = {

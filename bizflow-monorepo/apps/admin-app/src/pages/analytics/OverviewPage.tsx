@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 
 // 🌐 พจนานุกรมสำหรับหน้าแดชบอร์ด (Overview)
 const dict: Record<string, any> = {
@@ -62,7 +61,6 @@ const dict: Record<string, any> = {
 };
 
 export default function OverviewPage() {
-  const navigate = useNavigate();
   const [currentTime, setCurrentTime] = useState(new Date());
   const [branch, setBranch] = useState('bkk');
 
@@ -123,9 +121,6 @@ export default function OverviewPage() {
     .sort((a, b) => b.sales - a.sales);
 
   const currentKPI = branchData[branch];
-  const averageOrderValue = currentKPI.orders ? currentKPI.sales / currentKPI.orders : 0;
-  const newPercent = Math.round((currentKPI.newCustomers / currentKPI.customerTraffic) * 100);
-  const returningPercent = 100 - newPercent;
   const laborPercent = Math.round((currentKPI.wage / currentKPI.sales) * 100);
   const cogsPercent = Math.round((currentKPI.costOfGoods / currentKPI.sales) * 100);
   const netMarginPercent = Math.round((currentKPI.profit / currentKPI.sales) * 100);

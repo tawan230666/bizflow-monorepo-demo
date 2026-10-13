@@ -2,10 +2,36 @@ import { prisma } from "@/config/database";
 import { generateOrderNumber } from "@/utils/orderNumber";
 import { emitOrderCreated, emitOrderStatusChanged } from "@/sockets";
 import type { CreateOrderInput } from "@/types";
+import { HttpError } from "@/utils/httpError";
 
 export const orderService = {
   create: async (input: CreateOrderInput) => {
-    const totalPrice = input.items.reduce(
+    // Prices are always recomputed from the database. The client-sent
+    // `price` field is ignored so a tampered request cannot change the bill.
+    const menuItemIds = [...new Set(input.items.map((i) => i.menuItemId))];
+    const menuItems = await prisma.menuItem.findMany({
+      where: { id: { in: menuItemIds } },
+      include: { options: true },
+    });
+    const menuById = new Map(menuItems.map((m) => [m.id, m]));
+
+    const pricedItems = input.items.map((i) => {
+      const menuItem = menuById.get(i.menuItemId);
+      if (!menuItem || !menuItem.available) {
+        throw new HttpError(400, `Menu item ${i.menuItemId} is not available`);
+      }
+      if (!Number.isInteger(i.quantity) || i.quantity < 1 || i.quantity > 99) {
+        throw new HttpError(400, "Quantity must be an integer between 1 and 99");
+      }
+      const optionIds = new Set(i.selectedOptionIds ?? []);
+      const optionsTotal = menuItem.options
+        .filter((o) => optionIds.has(o.id))
+        .reduce((sum, o) => sum + Number(o.extraPrice), 0);
+      const unitPrice = Number(menuItem.price) + optionsTotal;
+      return { ...i, price: unitPrice };
+    });
+
+    const totalPrice = pricedItems.reduce(
       (sum, i) => sum + i.price * i.quantity,
       0
     );
@@ -18,7 +44,7 @@ export const orderService = {
           totalPrice,
           status: "pending",
           items: {
-            create: input.items.map((i) => ({
+            create: pricedItems.map((i) => ({
               menuItemId: i.menuItemId,
               quantity: i.quantity,
               note: i.note,

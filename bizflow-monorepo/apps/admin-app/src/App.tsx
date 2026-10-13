@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { BrowserRouter, Routes, Route, NavLink, Navigate, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import LoginPage from './pages/LoginPage';
 import OverviewPage from './pages/analytics/OverviewPage';
@@ -161,7 +161,7 @@ function DashboardLayout({ isDarkMode, setIsDarkMode }: any) {
           <div style={{ position: 'relative', display: 'flex', flexDirection: 'column' }}>
             <NavLink 
               to="/menu" 
-              onClick={(e) => {
+              onClick={() => {
                 // 🚀 เปลี่ยนจาก (true) เป็น (!isFranchiseOpen) เพื่อให้สลับเปิด/ปิดได้
                 setIsFranchiseOpen(!isFranchiseOpen); 
               }}

@@ -7,16 +7,9 @@ import { errorHandler, notFoundHandler } from "@/middlewares/errorHandler";
 export const createApp = () => {
   const app = express();
 
-  app.use(
-    cors({
-      origin: [
-        "http://localhost:3003",
-        "http://localhost:3000",
-        "http://localhost:4000",
-        "http://localhost:4001",
-      ],
-    })
-  );
+  // Allowed origins come from CORS_ORIGIN (comma-separated) so each
+  // environment can be configured without code changes.
+  app.use(cors({ origin: env.CORS_ORIGIN }));
 
   app.use(express.json({ limit: "10mb" }));
   app.use(express.urlencoded({ extended: true }));

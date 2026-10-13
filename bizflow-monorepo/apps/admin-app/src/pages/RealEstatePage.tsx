@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import './RealEstate.css';
 
 const navLinks = ['ร้าน', 'Mac', 'iPad', 'iPhone', 'Watch', 'AirPods', 'TV และบ้าน', 'ความบันเทิง', 'อุปกรณ์เสริม', 'บริการช่วยเหลือ'];
